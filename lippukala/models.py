@@ -112,7 +112,7 @@ class Code(models.Model):
         if self.prefix not in PREFIXES:  # In all honesty full_clean() should notice this due to the `choices` on the field
             raise ValueError("Un-sane situation detected: prefix %r is not in PREFIXES" % self.prefix)
 
-    def save(self, force_insert=False, force_update=False, using=None):
+    def save(self, *args, **kwargs):
         if not self.code:
             self.code = self._generate_code()
 
@@ -121,7 +121,7 @@ class Code(models.Model):
 
         self._check_sanity()
 
-        return super(Code, self).save(force_insert, force_update, using)
+        return super(Code, self).save(*args, **kwargs)
 
 
     def set_used(self, save=True):

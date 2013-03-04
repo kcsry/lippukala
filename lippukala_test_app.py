@@ -29,6 +29,8 @@ LIPPUKALA_LITERATE_KEYSPACES = {
     "3":    u"Miuku Mauku Kitler kaksi neliö".split(),
 }
 
+LIPPUKALA_CODE_MIN_N_DIGITS = 6
+LIPPUKALA_CODE_MAX_N_DIGITS = 10
 
 INSTALLED_APPS = ("lippukala", )
 
