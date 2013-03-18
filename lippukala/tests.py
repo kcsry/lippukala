@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 from django.test import TestCase
+import time
 from lippukala.models import Order, Code
 from lippukala.reports import get_code_report, CodeReportWriter
 from lippukala.settings import PREFIXES
+import random
 
 def _create_test_order():
+    fname = random.choice(["Teppo", "Tatu", "Tauno", "Tintti", "Taika"])
     order = Order.objects.create(
-        address_text=u"Testi Testinen\nTestikatu 123\n20100 Turku\nFinland",
+        address_text=u"%s Testinen\nTestikatu %d\n%05d Turku\nFinland" % (fname, random.randint(1, 50), random.randint(0, 99999)),
         free_text=u"Tervetuloa Testiconiin!",
-        comment=u"Testi on kiva jätkä."
+        comment=u"%s on kiva jätkä." % fname,
+        reference_number=str(int(time.time() * 10000 + random.randint(0, 35474500))),
     )
     assert order.pk
     for x in xrange(25):
@@ -68,3 +72,14 @@ class ReportTest(TestCase):
         for format in formats:
             self.assertTrue(get_code_report(format, False, True))
             self.assertTrue(get_code_report(format, True, False))
+
+class PrintingTest(TestCase):
+    def test_printing(self):
+        from lippukala.printing import OrderPrinter
+        printer = OrderPrinter()
+        for x in xrange(3):
+            order = _create_test_order()
+            printer.process_order(order)
+
+        with file("temp.pdf", "wb") as outf:
+            outf.write(printer.finish())

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 from string import digits
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -19,6 +20,8 @@ LITERATE_KEYSPACES = get_setting("LITERATE_KEYSPACES", {})
 CODE_MIN_N_DIGITS = get_integer_setting("CODE_MIN_N_DIGITS", 10)
 CODE_MAX_N_DIGITS = get_integer_setting("CODE_MAX_N_DIGITS", 10)
 CODE_ALLOW_LEADING_ZEROES = bool(get_setting("CODE_ALLOW_LEADING_ZEROES", True))
+PRINT_LOGO_PATH = get_setting("PRINT_LOGO_PATH")
+PRINT_LOGO_SIZE_CM = get_setting("PRINT_LOGO_SIZE_CM")
 
 def validate_settings():
     key_lengths = [len(k) for k in PREFIXES]
@@ -38,6 +41,11 @@ def validate_settings():
         if any(len(key) <= 1 for key in literate_keyspace) or len(set(literate_keyspace)) != len(literate_keyspace):
             raise ImproperlyConfigured("The literate keyspace for prefix %r has invalid or duplicate entries." % prefix)
 
+    if PRINT_LOGO_PATH:
+        if not os.path.isfile(PRINT_LOGO_PATH):
+            raise ImproperlyConfigured("PRINT_LOGO_PATH was defined, but does not exist (%r)" % PRINT_LOGO_PATH)
+        if not all(float(s) > 0 for s in PRINT_LOGO_SIZE_CM):
+            raise ImproperlyConfigured("PRINT_LOGO_SIZE_CM values not valid: %r" % PRINT_LOGO_SIZE_CM)
 
 validate_settings()
 del validate_settings  # aaaand it's gone

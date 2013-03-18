@@ -41,6 +41,7 @@ class Order(models.Model):
     event = models.CharField(max_length=32, blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)
+    reference_number = models.CharField(blank=True, null=True, max_length=64, unique=True, help_text="Reference number, unique")
     address_text = models.TextField(blank=True, help_text=u"Text printed in the PDF address area")
     free_text = models.TextField(blank=True, help_text=u"Text printed on PDF")
     comment = models.TextField(blank=True, help_text=u"Administrative comment")

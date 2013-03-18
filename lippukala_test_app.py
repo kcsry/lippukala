@@ -32,6 +32,9 @@ LIPPUKALA_LITERATE_KEYSPACES = {
 LIPPUKALA_CODE_MIN_N_DIGITS = 6
 LIPPUKALA_CODE_MAX_N_DIGITS = 10
 
+LIPPUKALA_PRINT_LOGO_PATH = "./fictitious_con.jpg"
+LIPPUKALA_PRINT_LOGO_SIZE_CM = (5.84, 1.5)
+
 INSTALLED_APPS = ("lippukala", )
 
 from django.core.management import execute_from_command_line
