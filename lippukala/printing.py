@@ -89,13 +89,13 @@ class OrderPrinter(object):
             )
 
         y = 297 * mm - self.TEXT_Y
-        canvas.line(self.PAGE_MARGIN_X, y, self.PAGE_WIDTH - self.PAGE_MARGIN_X * 2, y)
+        canvas.line(self.PAGE_MARGIN_X, y, self.PAGE_WIDTH - self.PAGE_MARGIN_X, y)
         y -= 3 * mm
         fontSize = 11.5
         leading = fontSize * 1.4
         y = draw_multiline(canvas, 18 * mm, y, fontSize, leading, order.free_text.strip().splitlines())
         y -= 6 * mm
-        canvas.line(self.PAGE_MARGIN_X, y, self.PAGE_WIDTH - self.PAGE_MARGIN_X * 2, y)
+        canvas.line(self.PAGE_MARGIN_X, y, self.PAGE_WIDTH - self.PAGE_MARGIN_X, y)
 
         self.draw_y = self._align_draw_y(y - self.INTERTICKET_MARGIN)
 
