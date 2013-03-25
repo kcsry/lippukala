@@ -93,7 +93,7 @@ function confirmUseCode(code) {
 function search(enter) {
     var nStarting = 0;
     var inputCode = codeInput.value;
-    var r = new RegExp("^" + inputCode);
+    var r = new RegExp("^" + inputCode, "i");
     var lastCode = null;
     document.body.className = "";
     forEachCode(function(code) {
@@ -106,7 +106,7 @@ function search(enter) {
         showCode(lastCode);
         if(enter) confirmUseCode(lastCode);
     } else {
-        statusDiv.innerHTML = "Vaihtoehtoja: " + nStarting;
+        statusDiv.innerHTML = "... " + nStarting + " ...";
     }
 }
 
