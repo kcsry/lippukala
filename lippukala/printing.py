@@ -1,4 +1,5 @@
 from cStringIO import StringIO
+import contextlib
 from reportlab.lib.units import cm, mm
 from reportlab.pdfgen.canvas import Canvas
 from lippukala.settings import PRINT_LOGO_PATH, PRINT_LOGO_SIZE_CM
@@ -26,6 +27,13 @@ def draw_tabular(canvas, x0, y0, fontSize, leading, x_offsets, lines):
 def draw_multiline(canvas, x0, y0, fontSize, leading, lines):
     return draw_tabular(canvas, x0, y0, fontSize, leading, (0, ), ((l,) for l in lines if l is not None))
 
+@contextlib.contextmanager
+def save_state(context):
+    context.saveState()
+    try:
+        yield True
+    finally:
+        context.restoreState()
 
 class OrderPrinter(object):
     PAGE_WIDTH = 21.0 * cm
@@ -118,35 +126,39 @@ class OrderPrinter(object):
 
         ticket_width = self.PAGE_WIDTH - 2 * self.PAGE_MARGIN_X
 
-        self.canvas.saveState()
-        self.canvas.translate(self.PAGE_MARGIN_X, self.draw_y - self.TICKET_HEIGHT)
 
-        self.canvas.roundRect(0, 0, ticket_width, self.TICKET_HEIGHT, 0.15 * cm)
-        self.canvas.setFont("Helvetica", 9, 8)
-        self.canvas.drawString(self.INTRA_TICKET_X_MARGIN, 3 * mm, "%s - %s - %s" % (code.product_text, code.full_code, code.literate_code))
-        linear_barcode_width = self.PAGE_WIDTH * 0.6
-        barcode_y_offset = 0.25 * self.TICKET_HEIGHT
-        barcode_height = 0.7 * self.TICKET_HEIGHT
-        linear_barcode = createBarcodeDrawing(
-            "Standard39",
-            checksum=False, # Seems to be extraneous (using Android's Barcode reader app),
-            quiet=False, # We'll deal with these ourselves
-            value=code.full_code,
-            width=linear_barcode_width,
-            height=barcode_height
-        )
+        with save_state(self.canvas):
+            self.canvas.translate(self.PAGE_MARGIN_X, self.draw_y - self.TICKET_HEIGHT)
 
-        draw_on_pdf(linear_barcode, self.canvas, self.INTRA_TICKET_X_MARGIN, barcode_y_offset)
-        qr_barcode_size = barcode_height
-        qr_barcode = createBarcodeDrawing("QR",
-                                          value=code.full_code,
-                                          barBorder=0, # We'll deal with these ourselves
-                                          width=qr_barcode_size,
-                                          height=qr_barcode_size
-        )
+            self.canvas.roundRect(0, 0, ticket_width, self.TICKET_HEIGHT, 0.15 * cm)
 
-        draw_on_pdf(qr_barcode, self.canvas, ticket_width - self.INTRA_TICKET_X_MARGIN - qr_barcode_size, barcode_y_offset)
+            linear_barcode_width = self.PAGE_WIDTH * 0.5
+            barcode_y_offset = 0.25 * self.TICKET_HEIGHT
+            barcode_height = 0.5 * self.TICKET_HEIGHT
+            linear_barcode = createBarcodeDrawing(
+                "Standard39",
+                checksum=False, # Seems to be extraneous (using Android's Barcode reader app),
+                quiet=False, # We'll deal with these ourselves
+                value=code.full_code,
+                width=linear_barcode_width,
+                height=barcode_height
+            )
 
-        self.canvas.restoreState()
+            barcode_bottom_y = self.TICKET_HEIGHT - 3 * mm - barcode_height
+            draw_on_pdf(linear_barcode, self.canvas, self.INTRA_TICKET_X_MARGIN, barcode_bottom_y)
+            qr_barcode_size = self.TICKET_HEIGHT - 6 * mm
+            qr_barcode = createBarcodeDrawing("QR",
+                                              value=code.full_code,
+                                              barBorder=0, # We'll deal with these ourselves
+                                              width=qr_barcode_size,
+                                              height=qr_barcode_size
+            )
+
+            draw_on_pdf(qr_barcode, self.canvas, ticket_width - self.INTRA_TICKET_X_MARGIN - qr_barcode_size, 3 * mm)
+
+            self.canvas.setFont("Helvetica", 9, 8)
+            self.canvas.drawString(self.INTRA_TICKET_X_MARGIN, 3 * mm, "%s - %s - %s" % (code.product_text, code.full_code, code.literate_code))
+
+            self.canvas.restoreState()
 
         self.draw_y -= (self.INTERTICKET_MARGIN + self.TICKET_HEIGHT)

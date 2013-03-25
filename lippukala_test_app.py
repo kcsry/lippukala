@@ -4,14 +4,14 @@
 # single-file Django app, for testing Lippukala.
 # Please excuse me.
 
-import os, sys
+import os, sys, tempfile
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "__main__")
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
+        'NAME': os.path.join(tempfile.gettempdir(), "lippukala_test.sqlite3"),
     }
 }
 
@@ -36,6 +36,30 @@ LIPPUKALA_PRINT_LOGO_PATH = "./fictitious_con.jpg"
 LIPPUKALA_PRINT_LOGO_SIZE_CM = (5.84, 1.5)
 
 INSTALLED_APPS = ("lippukala", )
+ROOT_URLCONF = "__main__"
+DEBUG = True
 
-from django.core.management import execute_from_command_line
-execute_from_command_line(sys.argv)
+from django.conf.urls import patterns, url
+from lippukala.views import POSView
+from django.views.decorators.csrf import csrf_exempt
+
+urlpatterns = patterns("",
+   url("^pos/$", csrf_exempt(POSView.as_view())),
+)
+
+def seed():
+    from lippukala.tests import _create_test_order
+    for x in xrange(20):
+        print _create_test_order().pk
+
+
+if __name__ == "__main__":
+    from django.core.management import execute_from_command_line
+    try:
+        func = globals().get(sys.argv[1])
+    except:
+        func = None
+    if func and callable(func):
+        func()
+    else:
+        execute_from_command_line(sys.argv)

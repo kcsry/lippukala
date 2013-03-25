@@ -32,6 +32,8 @@ else:
 ### --- Models ---
 ###
 
+class CantUseException(ValueError):
+    pass
 
 class Order(models.Model):
     """ Encapsulates an order, which may contain zero or more codes.
@@ -125,10 +127,11 @@ class Code(models.Model):
         return super(Code, self).save(*args, **kwargs)
 
 
-    def set_used(self, save=True):
+    def set_used(self, save=True, used_at=""):
         if self.status != UNUSED:
-            raise ValueError("Can't use a code in %s status!" % self.get_status_display())
+            raise CantUseException("Can't use a code in %s status!" % self.get_status_display())
         self.status = USED
-        self.used_at = now()
+        self.used_on = now()
+        self.used_at = used_at
         if save:
             return self.save()
