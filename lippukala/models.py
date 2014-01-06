@@ -48,6 +48,9 @@ class Order(models.Model):
     free_text = models.TextField(blank=True, help_text=u"Text printed on PDF")
     comment = models.TextField(blank=True, help_text=u"Administrative comment")
 
+    def __unicode__(self):
+        return "LK-%08d (ref %s)" % (self.pk, self.reference_number)
+
 
 class Code(models.Model):
     """ Encapsulates a single code, belonging to an order, that may be used to claim one or more products, as described in product_text. """
@@ -102,7 +105,7 @@ class Code(models.Model):
         if self.prefix:  # Oh -- and if we had a prefix, add its literate counterpart now.
             bits.insert(0, PREFIXES[self.prefix])
 
-        return " ".join(bits)
+        return " ".join(bits).strip()
 
 
     def _check_sanity(self):

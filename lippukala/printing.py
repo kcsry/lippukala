@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cStringIO import StringIO
 import contextlib
 from reportlab.lib.units import cm, mm
@@ -11,21 +12,21 @@ class Bold(unicode):
     pass
 
 
-def draw_tabular(canvas, x0, y0, fontSize, leading, x_offsets, lines):
+def draw_tabular(canvas, x0, y0, font_size, leading, x_offsets, lines):
     y = y0
     for i, line in enumerate(lines):
         x = x0
         y -= leading
         for j, datum in enumerate(line):
-            canvas.setFont("Helvetica-Bold" if isinstance(datum, Bold) else "Helvetica", fontSize)
+            canvas.setFont("Helvetica-Bold" if isinstance(datum, Bold) else "Helvetica", font_size)
             canvas.drawString(x, y, datum)
             if j <= len(x_offsets) - 1:
                 x += x_offsets[j]
     return y
 
 
-def draw_multiline(canvas, x0, y0, fontSize, leading, lines):
-    return draw_tabular(canvas, x0, y0, fontSize, leading, (0, ), ((l,) for l in lines if l is not None))
+def draw_multiline(canvas, x0, y0, font_size, leading, lines):
+    return draw_tabular(canvas, x0, y0, font_size, leading, (0, ), ((l,) for l in lines if l is not None))
 
 @contextlib.contextmanager
 def save_state(context):
@@ -46,6 +47,8 @@ class OrderPrinter(object):
     INTERTICKET_MARGIN = 0.5 * cm
     TICKET_HEIGHT = 3 * cm
 
+    ONE_TICKET_PER_PAGE = False
+
     def __init__(self):
         self.output = StringIO()
         self.canvas = Canvas(self.output, pagesize=(self.PAGE_WIDTH, self.PAGE_HEIGHT))
@@ -58,6 +61,15 @@ class OrderPrinter(object):
     def _align_draw_y(self, draw_y):
         resolution_cm = 0.5
         return int(draw_y / cm / resolution_cm) * resolution_cm * cm
+
+    def get_heading_texts(self, order, n_orders):
+        return [
+            (("Viitenumero: %s" % order.reference_number) if order.reference_number else None),
+            "Tilausaika: %s" % order.created_on.strftime("%d.%m.%Y klo %H:%M"),
+        ]
+
+    def get_free_text(self, order):
+        return order.free_text.strip()
 
     def _prime_new_order(self, order):
         canvas = self.canvas
@@ -75,18 +87,15 @@ class OrderPrinter(object):
             canvas.rect(x0, y0 - 35 * mm, 94 * mm, 35 * mm)
 
         canvas.setFillColor("black")
-        fontSize = 13
-        leading = fontSize * 1.3
-        draw_multiline(canvas, x0 + 2 * mm, y0 - (1 * mm), fontSize, leading, order.address_text.splitlines())
+        font_size = 13
+        leading = font_size * 1.3
+        draw_multiline(canvas, x0 + 2 * mm, y0 - (1 * mm), font_size, leading, order.address_text.splitlines())
 
         canvas.setFillColor("black")
-        fontSize = 11
-        leading = fontSize * 1.3
+        font_size = 11
+        leading = font_size * 1.3
 
-        draw_multiline(canvas, 115 * mm, y0 - (1 * mm), fontSize, leading, [
-            (("Viitenumero: %s" % order.reference_number) if order.reference_number else None),
-            "Tilausaika: %s" % order.created_on.strftime("%d.%m.%Y klo %H:%M"),
-        ])
+        draw_multiline(canvas, 115 * mm, y0 - (1 * mm), font_size, leading, self.get_heading_texts(order, self.n_orders))
 
         if PRINT_LOGO_PATH:
             image_width, image_height = [n * cm for n in PRINT_LOGO_SIZE_CM]
@@ -99,18 +108,23 @@ class OrderPrinter(object):
         y = 297 * mm - self.TEXT_Y
         canvas.line(self.PAGE_MARGIN_X, y, self.PAGE_WIDTH - self.PAGE_MARGIN_X, y)
         y -= 3 * mm
-        fontSize = 11.5
-        leading = fontSize * 1.4
-        y = draw_multiline(canvas, 18 * mm, y, fontSize, leading, order.free_text.strip().splitlines())
+        font_size = 11.5
+        leading = font_size * 1.4
+        y = draw_multiline(canvas, 18 * mm, y, font_size, leading, self.get_free_text(order).splitlines())
         y -= 6 * mm
         canvas.line(self.PAGE_MARGIN_X, y, self.PAGE_WIDTH - self.PAGE_MARGIN_X, y)
 
         self.draw_y = self._align_draw_y(y - self.INTERTICKET_MARGIN)
 
     def process_order(self, order):
-        self._prime_new_order(order)
-        for index, code in enumerate(order.code_set.order_by("literate_code", "code")):
-            self._print_code(index, order, code)
+        if self.ONE_TICKET_PER_PAGE:
+            for index, code in enumerate(order.code_set.order_by("literate_code", "code")):
+                self._prime_new_order(order)
+                self._print_code(index, order, code)
+        else:
+            self._prime_new_order(order)
+            for index, code in enumerate(order.code_set.order_by("literate_code", "code")):
+                self._print_code(index, order, code)
 
     def _print_code(self, index, order, code):
 
@@ -156,9 +170,9 @@ class OrderPrinter(object):
 
             draw_on_pdf(qr_barcode, self.canvas, ticket_width - self.INTRA_TICKET_X_MARGIN - qr_barcode_size, 3 * mm)
 
-            self.canvas.setFont("Helvetica", 9, 8)
-            self.canvas.drawString(self.INTRA_TICKET_X_MARGIN, 3 * mm, "%s - %s - %s" % (code.product_text, code.full_code, code.literate_code))
-
-            self.canvas.restoreState()
+            y = draw_multiline(self.canvas, self.INTRA_TICKET_X_MARGIN, 11 * mm, 9, 12, [
+                u"%s \u2014 %s" % (code.product_text, code.full_code),
+                code.literate_code
+            ])
 
         self.draw_y -= (self.INTERTICKET_MARGIN + self.TICKET_HEIGHT)

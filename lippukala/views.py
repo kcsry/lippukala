@@ -24,11 +24,15 @@ def serialize_code(code):
 class POSView(TemplateView):
     template_name = "lippukala/pos.html"
 
-    def get_json(self, request):
+    def get_valid_codes(self, request):
         event_filter = request.GET.get("event")
         qs = Code.objects.all().select_related("order")
         if event_filter:
             qs = qs.filter(event=event_filter)
+        return qs
+
+    def get_json(self, request):
+        qs = self.get_valid_codes(request)
         data = [serialize_code(code) for code in qs.iterator()]
         json_data = json.dumps({"codes": data})
         return HttpResponse(json_data, content_type="application/json")
@@ -45,8 +49,9 @@ class POSView(TemplateView):
             station = request.REQUEST.get("station") or "(n/a)"
             ids = [int(s, 10) for s in request.REQUEST.get("use").split(",")]
             codes = []
+            qs = self.get_valid_codes(request)
             for id in ids:
-                code = Code.objects.get(pk=id)
+                code = qs.get(pk=id)
                 try:
                     code.set_used(used_at=station)
                 except CantUseException:
