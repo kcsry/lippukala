@@ -15,6 +15,7 @@ def serialize_code(code):
         "id": code.id,
         "used": bool(code.used_at),
         "code": code.code,
+        "prefix": code.prefix,
         "lit": code.literate_code,
         "name": code.order.address_text,
         "comment": code.order.comment,
@@ -46,7 +47,12 @@ class POSView(TemplateView):
     def post(self, request, *args, **kwargs):
         json_data = '{"what": true}'
         if request.REQUEST.get("use"):
-            station = request.REQUEST.get("station") or "(n/a)"
+            station = None
+            try:
+                station = request.user.username
+            except:
+                pass
+            station = station or request.REQUEST.get("station") or "(n/a)"
             ids = [int(s, 10) for s in request.REQUEST.get("use").split(",")]
             codes = []
             qs = self.get_valid_codes(request)
