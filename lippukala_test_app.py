@@ -15,6 +15,8 @@ DATABASES = {
     }
 }
 
+SECRET_KEY = 'secret'
+
 LIPPUKALA_PREFIXES = {
     "0":    u"mat",
     "1":    u"nom",
