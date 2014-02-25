@@ -3,7 +3,8 @@ from random import choice, randint
 from string import digits
 from django.db import models
 from django.utils.timezone import now
-from lippukala.settings import CODE_MIN_N_DIGITS, CODE_MAX_N_DIGITS, PREFIXES, LITERATE_KEYSPACES, CODE_ALLOW_LEADING_ZEROES
+
+from .settings import CODE_MIN_N_DIGITS, CODE_MAX_N_DIGITS, PREFIXES, LITERATE_KEYSPACES, CODE_ALLOW_LEADING_ZEROES
 
 ###
 ### --- Constants ---
