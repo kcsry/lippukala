@@ -43,7 +43,7 @@ class OrderPrinter(object):
     PAGE_MARGIN_X = 18 * mm
     TEXT_Y = 80 * mm
 
-    INTRA_TICKET_X_MARGIN = 5 * mm
+    INTRA_TICKET_X_MARGIN = 12 * mm
     INTERTICKET_MARGIN = 0.5 * cm
     TICKET_HEIGHT = 3 * cm
 
