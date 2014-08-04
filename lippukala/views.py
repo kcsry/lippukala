@@ -8,7 +8,7 @@ except ImportError:
 
 from django.views.generic import TemplateView
 from lippukala.models import Code, CantUseException
-
+import urlparse
 
 def serialize_code(code):
     return {
@@ -46,14 +46,20 @@ class POSView(TemplateView):
 
     def post(self, request, *args, **kwargs):
         json_data = '{"what": true}'
-        if request.REQUEST.get("use"):
+        use = request.REQUEST.get("use")
+        if not use:
+            try:
+                use = urlparse.parse_qs(request.body)["use"][0]
+            except:
+                pass
+        if use:
             station = None
             try:
                 station = request.user.username
             except:
                 pass
             station = station or request.REQUEST.get("station") or "(n/a)"
-            ids = [int(s, 10) for s in request.REQUEST.get("use").split(",")]
+            ids = [int(s, 10) for s in use.split(",")]
             codes = []
             qs = self.get_valid_codes(request)
             for id in ids:
