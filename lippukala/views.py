@@ -10,6 +10,7 @@ from django.views.generic import TemplateView
 from lippukala.models import Code, CantUseException
 import urlparse
 
+
 def serialize_code(code):
     return {
         "id": code.id,
@@ -21,6 +22,7 @@ def serialize_code(code):
         "comment": code.order.comment,
         "prod": code.product_text,
     }
+
 
 class POSView(TemplateView):
     template_name = "lippukala/pos.html"
@@ -42,7 +44,6 @@ class POSView(TemplateView):
         if request.GET.get("json"):
             return self.get_json(request)
         return super(POSView, self).get(request, *args, **kwargs)
-
 
     def post(self, request, *args, **kwargs):
         json_data = '{"what": true}'

@@ -6,6 +6,7 @@ from lippukala.reports import get_code_report, CodeReportWriter
 from lippukala.settings import PREFIXES
 import random
 
+
 def _create_test_order():
     fname = random.choice(["Teppo", "Tatu", "Tauno", "Tintti", "Taika"])
     order = Order.objects.create(
@@ -26,6 +27,7 @@ def _create_test_order():
 
 
 class OrderCreationTest(TestCase):
+
     def test_creating_order(self):
         order = _create_test_order()
         self.assertTrue(order.code_set.count() == 25, "orders don't hold their codes")
@@ -34,9 +36,11 @@ class OrderCreationTest(TestCase):
 
     def test_cant_create_invalid_prefix(self):
         order = Order.objects.create(comment="Dummy")
+
         def t1():
             Code.objects.create(order=order, prefix="HQ")
         self.assertRaises(ValueError, t1)
+
         def t2():
             Code.objects.create(order=order, prefix="69")
         self.assertRaises(ValueError, t2)
@@ -44,20 +48,23 @@ class OrderCreationTest(TestCase):
 
 
 class CodeUseTest(TestCase):
+
     def test_double_use_code(self):
         order = _create_test_order()
         code = order.code_set.all()[:1][0]
         self.assertFalse(code.is_used, "code is not used")
         code.set_used(save=True)
         self.assertTrue(code.is_used, "code is used")
-        code = Code.objects.get(pk=code.pk) # reload it to see if saving worked
+        code = Code.objects.get(pk=code.pk)  # reload it to see if saving worked
         self.assertTrue(code.is_used, "code is used (even from the db)")
+
         def t():
             code.set_used()
         self.assertRaises(ValueError, t)
 
 
 class ReportTest(TestCase):
+
     def test_csv_reports_have_good_stuff(self):
         order = _create_test_order()
         csv_report_data = get_code_report("csv", False)
@@ -73,7 +80,9 @@ class ReportTest(TestCase):
             self.assertTrue(get_code_report(format, False, True))
             self.assertTrue(get_code_report(format, True, False))
 
+
 class PrintingTest(TestCase):
+
     def test_printing(self):
         from lippukala.printing import OrderPrinter
         printer = OrderPrinter()

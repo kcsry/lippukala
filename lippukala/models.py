@@ -7,7 +7,7 @@ from django.utils.timezone import now
 from .settings import CODE_MIN_N_DIGITS, CODE_MAX_N_DIGITS, PREFIXES, LITERATE_KEYSPACES, CODE_ALLOW_LEADING_ZEROES
 
 ###
-### --- Constants ---
+# --- Constants ---
 ###
 
 UNUSED = 0
@@ -30,13 +30,16 @@ else:
     PREFIX_MAY_BE_BLANK = True
 
 ###
-### --- Models ---
+# --- Models ---
 ###
+
 
 class CantUseException(ValueError):
     pass
 
+
 class Order(models.Model):
+
     """ Encapsulates an order, which may contain zero or more codes.
 
     :var event: An (optional) event identifier for this order. May be used at the client app's discretion.
@@ -54,6 +57,7 @@ class Order(models.Model):
 
 
 class Code(models.Model):
+
     """ Encapsulates a single code, belonging to an order, that may be used to claim one or more products, as described in product_text. """
     order = models.ForeignKey(Order)
     created_on = models.DateTimeField(auto_now_add=True)
@@ -71,7 +75,6 @@ class Code(models.Model):
     def __unicode__(self):
         return "Code %s (%s) (%s)" % (self.full_code, self.literate_code, self.get_status_display())
 
-
     def _generate_code(self):
         qs = self.__class__.objects
         for attempt in xrange(500):  # 500 attempts really REALLY should be enough.
@@ -85,7 +88,6 @@ class Code(models.Model):
                     return code
 
         raise ValueError("Unable to find an unused code! Is the keyspace exhausted?")
-
 
     def _generate_literate_code(self):
         keyspace = (LITERATE_KEYSPACES.get(self.prefix) or LITERATE_KEYSPACES.get(None))
@@ -108,7 +110,6 @@ class Code(models.Model):
 
         return " ".join(bits).strip()
 
-
     def _check_sanity(self):
         if self.used_on and self.status != USED:
             raise ValueError("Un-sane situation detected: saving Code with used status and no usage date")
@@ -129,7 +130,6 @@ class Code(models.Model):
         self._check_sanity()
 
         return super(Code, self).save(*args, **kwargs)
-
 
     def set_used(self, save=True, used_at=""):
         if self.status != UNUSED:

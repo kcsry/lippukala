@@ -7,6 +7,7 @@ try:
 except ImportError:
     import StringIO
 
+
 class CodeReportWriter(object):
 
     def __init__(self, code_queryset):

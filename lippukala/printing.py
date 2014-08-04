@@ -28,6 +28,7 @@ def draw_tabular(canvas, x0, y0, font_size, leading, x_offsets, lines):
 def draw_multiline(canvas, x0, y0, font_size, leading, lines):
     return draw_tabular(canvas, x0, y0, font_size, leading, (0, ), ((l,) for l in lines if l is not None))
 
+
 @contextlib.contextmanager
 def save_state(context):
     context.saveState()
@@ -35,6 +36,7 @@ def save_state(context):
         yield True
     finally:
         context.restoreState()
+
 
 class OrderPrinter(object):
     PAGE_WIDTH = 21.0 * cm
@@ -140,7 +142,6 @@ class OrderPrinter(object):
 
         ticket_width = self.PAGE_WIDTH - 2 * self.PAGE_MARGIN_X
 
-
         with save_state(self.canvas):
             self.canvas.translate(self.PAGE_MARGIN_X, self.draw_y - self.TICKET_HEIGHT)
 
@@ -151,8 +152,8 @@ class OrderPrinter(object):
             barcode_height = 0.5 * self.TICKET_HEIGHT
             linear_barcode = createBarcodeDrawing(
                 "Standard39",
-                checksum=False, # Seems to be extraneous (using Android's Barcode reader app),
-                quiet=False, # We'll deal with these ourselves
+                checksum=False,  # Seems to be extraneous (using Android's Barcode reader app),
+                quiet=False,  # We'll deal with these ourselves
                 value=code.full_code,
                 width=linear_barcode_width,
                 height=barcode_height
@@ -163,10 +164,10 @@ class OrderPrinter(object):
             qr_barcode_size = self.TICKET_HEIGHT - 6 * mm
             qr_barcode = createBarcodeDrawing("QR",
                                               value=code.full_code,
-                                              barBorder=0, # We'll deal with these ourselves
+                                              barBorder=0,  # We'll deal with these ourselves
                                               width=qr_barcode_size,
                                               height=qr_barcode_size
-            )
+                                              )
 
             draw_on_pdf(qr_barcode, self.canvas, ticket_width - self.INTRA_TICKET_X_MARGIN - qr_barcode_size, 3 * mm)
 

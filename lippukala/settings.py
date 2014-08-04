@@ -8,6 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 def get_setting(name, default=None):
     return getattr(settings, "LIPPUKALA_%s" % name, default)
 
+
 def get_integer_setting(name, default=0):
     try:
         value = get_setting(name, default)
@@ -22,6 +23,7 @@ CODE_MAX_N_DIGITS = get_integer_setting("CODE_MAX_N_DIGITS", 10)
 CODE_ALLOW_LEADING_ZEROES = bool(get_setting("CODE_ALLOW_LEADING_ZEROES", True))
 PRINT_LOGO_PATH = get_setting("PRINT_LOGO_PATH")
 PRINT_LOGO_SIZE_CM = get_setting("PRINT_LOGO_SIZE_CM")
+
 
 def validate_settings():
     key_lengths = [len(k) for k in PREFIXES]
