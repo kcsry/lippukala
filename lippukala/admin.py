@@ -33,7 +33,7 @@ class CodeAdmin(ModelAdmin):
     ordering = ["code"]
 
     def get_queryset(self, request):
-        qs = super(CodeAdmin, self).queryset(request)
+        qs = super(CodeAdmin, self).get_queryset(request)
         qs = qs.select_related("order")
         return qs
 
