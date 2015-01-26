@@ -12,6 +12,7 @@ class CodeInline(TabularInline):
 class OrderAdmin(ModelAdmin):
     inlines = [CodeInline]
     search_fields = ["reference_number", "address_text", "comment"]
+    list_filter = ["event"]
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -28,7 +29,7 @@ order_details.short_description = u"Order"
 class CodeAdmin(ModelAdmin):
     search_fields = ["code", "literate_code", "order__reference_number", "order__address_text", "order__comment"]
     readonly_fields = ["order", "code", "literate_code", "prefix", "product_text"]
-    list_filter = ["status"]
+    list_filter = ["order__event", "status"]
     list_display = ["status", "code", "literate_code", order_details]
     ordering = ["code"]
 
