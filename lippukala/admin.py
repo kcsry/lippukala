@@ -27,9 +27,9 @@ order_details.short_description = u"Order"
 
 class CodeAdmin(ModelAdmin):
     search_fields = ["code", "literate_code", "order__reference_number", "order__address_text", "order__comment"]
-    readonly_fields = ["event", "order", "code", "literate_code", "prefix", "product_text"]
-    list_filter = ["event", "status"]
-    list_display = ["event", "status", "code", "literate_code", order_details]
+    readonly_fields = ["order", "code", "literate_code", "prefix", "product_text"]
+    list_filter = ["status"]
+    list_display = ["status", "code", "literate_code", order_details]
     ordering = ["code"]
 
     def get_queryset(self, request):
