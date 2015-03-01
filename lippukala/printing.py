@@ -51,10 +51,12 @@ class OrderPrinter(object):
 
     ONE_TICKET_PER_PAGE = False
 
-    def __init__(self):
+    def __init__(self, print_logo_path=PRINT_LOGO_PATH, print_logo_size_cm=PRINT_LOGO_SIZE_CM):
         self.output = StringIO()
         self.canvas = Canvas(self.output, pagesize=(self.PAGE_WIDTH, self.PAGE_HEIGHT))
         self.n_orders = 0
+        self.print_logo_path = print_logo_path
+        self.print_logo_size_cm = print_logo_size_cm
 
     def finish(self):
         self.canvas.save()
@@ -99,10 +101,10 @@ class OrderPrinter(object):
 
         draw_multiline(canvas, 115 * mm, y0 - (1 * mm), font_size, leading, self.get_heading_texts(order, self.n_orders))
 
-        if PRINT_LOGO_PATH:
-            image_width, image_height = [n * cm for n in PRINT_LOGO_SIZE_CM]
+        if self.print_logo_path:
+            image_width, image_height = [n * cm for n in self.print_logo_size_cm]
             canvas.drawImage(
-                PRINT_LOGO_PATH,
+                self.print_logo_path,
                 115 * mm, y0 + 1 * mm,
                 image_width, image_height,
             )
