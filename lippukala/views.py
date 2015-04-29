@@ -30,7 +30,6 @@ class POSView(TemplateView):
     def get_valid_codes(self, request):
         event_filter = request.GET.get("event")
         qs = Code.objects.all().select_related("order")
-        print 'event_filter', event_filter
         if event_filter:
             qs = qs.filter(order__event=event_filter)
         return qs
