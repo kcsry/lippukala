@@ -47,7 +47,7 @@ class POSView(TemplateView):
 
     def post(self, request, *args, **kwargs):
         json_data = '{"what": true}'
-        use = request.REQUEST.get("use")
+        use = request.POST.get("use")
         if not use:
             try:
                 use = urlparse.parse_qs(request.body)["use"][0]
@@ -59,7 +59,7 @@ class POSView(TemplateView):
                 station = request.user.username
             except:
                 pass
-            station = station or request.REQUEST.get("station") or "(n/a)"
+            station = station or request.POST.get("station") or "(n/a)"
             ids = [int(s, 10) for s in use.split(",")]
             codes = []
             qs = self.get_valid_codes(request)
