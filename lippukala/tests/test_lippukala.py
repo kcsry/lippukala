@@ -2,6 +2,7 @@
 import random
 import time
 
+from django.utils.six import StringIO
 from django.test import TestCase
 
 from lippukala.models import Code, Order
@@ -92,5 +93,6 @@ class PrintingTest(TestCase):
             order = _create_test_order()
             printer.process_order(order)
 
-        with file("temp.pdf", "wb") as outf:
-            outf.write(printer.finish())
+        outf = StringIO()
+        outf.write(printer.finish())
+        assert outf.getvalue().startswith("%PDF")
