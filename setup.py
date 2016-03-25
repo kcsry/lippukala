@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
 import os
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
+
 
 def requirements(filename):
     with open(os.path.abspath(os.path.join(os.path.dirname(__file__), filename))) as f:

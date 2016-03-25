@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
-from django.http import HttpResponse
-from lippukala.models import Code
 import time
+
+from django.http import HttpResponse
+
+from lippukala.models import Code
+
 try:
     import cStringIO as StringIO
 except ImportError:

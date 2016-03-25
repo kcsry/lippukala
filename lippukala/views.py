@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
+import urlparse
+
 from django.http import HttpResponse
+from django.views.generic import TemplateView
+
+from lippukala.models import CantUseException, Code
 
 try:
     import json
 except ImportError:
     import django.utils.simplejson as json
-
-from django.views.generic import TemplateView
-from lippukala.models import Code, CantUseException
-import urlparse
 
 
 def serialize_code(code):

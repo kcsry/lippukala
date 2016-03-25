@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
-from cStringIO import StringIO
 import contextlib
-from reportlab.lib.units import cm, mm
-from reportlab.pdfgen.canvas import Canvas
-from lippukala.settings import PRINT_LOGO_PATH, PRINT_LOGO_SIZE_CM
+from cStringIO import StringIO
+
 from reportlab.graphics.barcode import createBarcodeDrawing
 from reportlab.graphics.renderPDF import draw as draw_on_pdf
+from reportlab.lib.units import cm, mm
+from reportlab.pdfgen.canvas import Canvas
+
+from lippukala.settings import PRINT_LOGO_PATH, PRINT_LOGO_SIZE_CM
 
 
 class Bold(unicode):
@@ -26,7 +28,7 @@ def draw_tabular(canvas, x0, y0, font_size, leading, x_offsets, lines):
 
 
 def draw_multiline(canvas, x0, y0, font_size, leading, lines):
-    return draw_tabular(canvas, x0, y0, font_size, leading, (0, ), ((l,) for l in lines if l is not None))
+    return draw_tabular(canvas, x0, y0, font_size, leading, (0,), ((l,) for l in lines if l is not None))
 
 
 @contextlib.contextmanager
@@ -93,13 +95,19 @@ class OrderPrinter(object):
         canvas.setFillColor("black")
         font_size = 13
         leading = font_size * 1.3
-        draw_multiline(canvas, x0 + 2 * mm, y0 - (1 * mm), font_size, leading, order.address_text.splitlines())
+        draw_multiline(
+            canvas, x0 + 2 * mm, y0 - (1 * mm), font_size, leading,
+            order.address_text.splitlines()
+        )
 
         canvas.setFillColor("black")
         font_size = 11
         leading = font_size * 1.3
 
-        draw_multiline(canvas, 115 * mm, y0 - (1 * mm), font_size, leading, self.get_heading_texts(order, self.n_orders))
+        draw_multiline(
+            canvas, 115 * mm, y0 - (1 * mm), font_size, leading,
+            self.get_heading_texts(order, self.n_orders)
+        )
 
         if self.print_logo_path:
             image_width, image_height = [n * cm for n in self.print_logo_size_cm]
@@ -150,7 +158,6 @@ class OrderPrinter(object):
             self.canvas.roundRect(0, 0, ticket_width, self.TICKET_HEIGHT, 0.15 * cm)
 
             linear_barcode_width = self.PAGE_WIDTH * 0.5
-            barcode_y_offset = 0.25 * self.TICKET_HEIGHT
             barcode_height = 0.5 * self.TICKET_HEIGHT
             linear_barcode = createBarcodeDrawing(
                 "Standard39",
@@ -164,18 +171,22 @@ class OrderPrinter(object):
             barcode_bottom_y = self.TICKET_HEIGHT - 3 * mm - barcode_height
             draw_on_pdf(linear_barcode, self.canvas, self.INTRA_TICKET_X_MARGIN, barcode_bottom_y)
             qr_barcode_size = self.TICKET_HEIGHT - 6 * mm
-            qr_barcode = createBarcodeDrawing("QR",
-                                              value=code.full_code,
-                                              barBorder=0,  # We'll deal with these ourselves
-                                              width=qr_barcode_size,
-                                              height=qr_barcode_size
-                                              )
+            qr_barcode = createBarcodeDrawing(
+                "QR",
+                value=code.full_code,
+                barBorder=0,  # We'll deal with these ourselves
+                width=qr_barcode_size,
+                height=qr_barcode_size
+            )
 
             draw_on_pdf(qr_barcode, self.canvas, ticket_width - self.INTRA_TICKET_X_MARGIN - qr_barcode_size, 3 * mm)
 
-            y = draw_multiline(self.canvas, self.INTRA_TICKET_X_MARGIN, 11 * mm, 9, 12, [
-                u"%s \u2014 %s" % (code.product_text, code.full_code),
-                code.literate_code
-            ])
+            y = draw_multiline(
+                self.canvas, self.INTRA_TICKET_X_MARGIN, 11 * mm, 9, 12,
+                [
+                    u"%s \u2014 %s" % (code.product_text, code.full_code),
+                    code.literate_code
+                ]
+            )
 
         self.draw_y -= (self.INTERTICKET_MARGIN + self.TICKET_HEIGHT)

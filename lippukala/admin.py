@@ -1,8 +1,8 @@
 # -- encoding: UTF-8 --
 from django.contrib.admin import site
-from django.contrib.admin.options import TabularInline, ModelAdmin
+from django.contrib.admin.options import ModelAdmin, TabularInline
 
-from lippukala.models import Order, Code
+from lippukala.models import Code, Order
 
 
 class CodeInline(TabularInline):

@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
-from django.test import TestCase
-import time
-from lippukala.models import Order, Code
-from lippukala.reports import get_code_report, CodeReportWriter
-from lippukala.settings import PREFIXES
 import random
+import time
+
+from django.test import TestCase
+
+from lippukala.models import Code, Order
+from lippukala.reports import CodeReportWriter, get_code_report
+from lippukala.settings import PREFIXES
 
 
 def _create_test_order():
@@ -74,7 +76,7 @@ class ReportTest(TestCase):
             self.assertTrue(code.literate_code in csv_report_data, "code %r was missing" % code)
 
     def test_all_report_formats_seem_to_work(self):
-        order = _create_test_order()
+        _create_test_order()
         formats = [n.split("_")[1] for n in dir(CodeReportWriter) if n.startswith("format_")]
         for format in formats:
             self.assertTrue(get_code_report(format, False, True))
