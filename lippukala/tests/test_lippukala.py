@@ -2,6 +2,7 @@
 import random
 import time
 
+import pytest
 from django.utils.six import StringIO
 from django.test import TestCase
 
@@ -84,15 +85,16 @@ class ReportTest(TestCase):
             self.assertTrue(get_code_report(format, True, False))
 
 
-class PrintingTest(TestCase):
+@pytest.mark.parametrize("one_per_page", (False, True))
+@pytest.mark.django_db
+def test_printing(one_per_page):
+    from lippukala.printing import OrderPrinter
+    printer = OrderPrinter()
+    printer.ONE_TICKET_PER_PAGE = one_per_page
+    for x in xrange(3):
+        order = _create_test_order()
+        printer.process_order(order)
 
-    def test_printing(self):
-        from lippukala.printing import OrderPrinter
-        printer = OrderPrinter()
-        for x in xrange(3):
-            order = _create_test_order()
-            printer.process_order(order)
-
-        outf = StringIO()
-        outf.write(printer.finish())
-        assert outf.getvalue().startswith("%PDF")
+    outf = StringIO()
+    outf.write(printer.finish())
+    assert outf.getvalue().startswith("%PDF")

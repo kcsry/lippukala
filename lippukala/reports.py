@@ -5,23 +5,23 @@ from django.http import HttpResponse
 
 from lippukala.models import Code
 
-try:
-    import cStringIO as StringIO
-except ImportError:
-    import StringIO
+from django.utils.six import StringIO
 
 
 class CodeReportWriter(object):
 
     def __init__(self, code_queryset):
         self.code_queryset = code_queryset
-        self.fields_iterator = ((code.full_code, code.literate_code, u"Käytetty %s" % code.used_on if code.used_on else "") for code in code_queryset.iterator())
+
+    def get_fields_iterator(self):
+        return ((code.full_code, code.literate_code, u"Käytetty %s" % code.used_on if code.used_on else "") for code in
+                self.code_queryset.iterator())
 
     def get_report(self, format, as_response):
         format = str(format).lower()
         filename = "code_report_%d.%s" % (time.time(), format)
         format_writer = getattr(self, "format_%s_report" % format, None)
-        if not format_writer:
+        if not format_writer:  # pragma: no cover
             raise ValueError("Unknown format: %r" % format)
         return format_writer(filename=filename, as_response=as_response)
 
@@ -30,12 +30,12 @@ class CodeReportWriter(object):
         workbook = xlwt.Workbook("UTF-8")
         sheet = workbook.add_sheet("Koodit")
         y = 0
-        for fields in self.fields_iterator:
+        for fields in self.get_fields_iterator():
             for x, val in enumerate(fields):
                 sheet.write(y, x, val)
             y += 1
 
-        sio = StringIO.StringIO()
+        sio = StringIO()
         workbook.save(sio)
 
         if as_response:
@@ -48,7 +48,7 @@ class CodeReportWriter(object):
     def _format_delimited_report(self, filename, as_response, field_delimiter=";", record_delimiter="\r\n"):
         content_type = "text/csv"
 
-        iterator = (field_delimiter.join(fields) + record_delimiter for fields in self.fields_iterator)
+        iterator = (field_delimiter.join(fields) + record_delimiter for fields in self.get_fields_iterator())
         if as_response:
             response = HttpResponse(iterator, content_type=content_type)
             response["Content-Disposition"] = "attachment; filename=%s" % filename
@@ -64,7 +64,7 @@ class CodeReportWriter(object):
 
     def format_pdf_report(self, filename, as_response):
         from reportlab.pdfgen.canvas import Canvas
-        sio = StringIO.StringIO()
+        sio = StringIO()
         c = Canvas(sio)
         c.save()
 

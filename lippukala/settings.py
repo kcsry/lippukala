@@ -14,7 +14,7 @@ def get_integer_setting(name, default=0):
     try:
         value = get_setting(name, default)
         return int(value)
-    except ValueError:
+    except ValueError:  # pragma: no cover
         raise ImproperlyConfigured("LIPPUKALA_%s must be an integer (got %r)" % (name, value))
 
 
@@ -27,7 +27,7 @@ PRINT_LOGO_PATH = get_setting("PRINT_LOGO_PATH")
 PRINT_LOGO_SIZE_CM = get_setting("PRINT_LOGO_SIZE_CM")
 
 
-def validate_settings():
+def validate_settings():  # pragma: no cover
     key_lengths = [len(k) for k in PREFIXES]
     if key_lengths and not all(k == key_lengths[0] for k in key_lengths):
         raise ImproperlyConfigured("All LIPPUKALA_PREFIXES keys must be the same length!")
