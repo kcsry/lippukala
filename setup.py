@@ -11,7 +11,7 @@ def requirements(filename):
 
 setup(
     name='lippukala',
-    version='1.0.1',
+    version='1.1.0',
     description='Desuconin ja Traconin e-lippu-jarjestelma',
     author='Aarni Koskela',
     author_email='akx@desucon.fi',
