@@ -3,6 +3,7 @@ from random import choice, randint
 from string import digits
 
 from django.db import models
+from django.utils.six.moves import xrange
 from django.utils.timezone import now
 
 from .settings import CODE_ALLOW_LEADING_ZEROES, CODE_MAX_N_DIGITS, CODE_MIN_N_DIGITS, LITERATE_KEYSPACES, PREFIXES
@@ -24,7 +25,7 @@ CODE_STATUS_CHOICES = (
 )
 
 if PREFIXES:
-    PREFIX_CHOICES = [(p, "%s [%s]" % (p, t)) for (p, t) in sorted(PREFIXES.iteritems())]
+    PREFIX_CHOICES = [(p, "%s [%s]" % (p, t)) for (p, t) in sorted(PREFIXES.items())]
     PREFIX_MAY_BE_BLANK = False
 else:
     PREFIX_CHOICES = [("", "---")]

@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import time
 
+from django.conf import settings
 from django.http import HttpResponse
+from django.utils.six import BytesIO
 
 from lippukala.models import Code
-
-from django.utils.six import StringIO
 
 
 class CodeReportWriter(object):
@@ -35,7 +37,7 @@ class CodeReportWriter(object):
                 sheet.write(y, x, val)
             y += 1
 
-        sio = StringIO()
+        sio = BytesIO()
         workbook.save(sio)
 
         if as_response:
@@ -46,7 +48,7 @@ class CodeReportWriter(object):
             return sio.getvalue()
 
     def _format_delimited_report(self, filename, as_response, field_delimiter=";", record_delimiter="\r\n"):
-        content_type = "text/csv"
+        content_type = "text/csv; charset=%s" % settings.DEFAULT_CHARSET
 
         iterator = (field_delimiter.join(fields) + record_delimiter for fields in self.get_fields_iterator())
         if as_response:
@@ -54,7 +56,7 @@ class CodeReportWriter(object):
             response["Content-Disposition"] = "attachment; filename=%s" % filename
             return response
         else:
-            return "".join(iterator)
+            return ("".join(iterator)).encode(settings.DEFAULT_CHARSET)
 
     def format_csv_report(self, filename, as_response):
         return self._format_delimited_report(filename, as_response, field_delimiter=";")
@@ -64,7 +66,7 @@ class CodeReportWriter(object):
 
     def format_pdf_report(self, filename, as_response):
         from reportlab.pdfgen.canvas import Canvas
-        sio = StringIO()
+        sio = BytesIO()
         c = Canvas(sio)
         c.save()
 

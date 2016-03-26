@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 import contextlib
-from cStringIO import StringIO
 
+from django.utils.six import BytesIO, text_type
+
+from lippukala.settings import PRINT_LOGO_PATH, PRINT_LOGO_SIZE_CM
 from reportlab.graphics.barcode import createBarcodeDrawing
 from reportlab.graphics.renderPDF import draw as draw_on_pdf
 from reportlab.lib.units import cm, mm
 from reportlab.pdfgen.canvas import Canvas
 
-from lippukala.settings import PRINT_LOGO_PATH, PRINT_LOGO_SIZE_CM
 
-
-class Bold(unicode):
+class Bold(text_type):
     pass
 
 
@@ -54,7 +54,7 @@ class OrderPrinter(object):
     ONE_TICKET_PER_PAGE = False
 
     def __init__(self, print_logo_path=PRINT_LOGO_PATH, print_logo_size_cm=PRINT_LOGO_SIZE_CM):
-        self.output = StringIO()
+        self.output = BytesIO()
         self.canvas = Canvas(self.output, pagesize=(self.PAGE_WIDTH, self.PAGE_HEIGHT))
         self.n_orders = 0
         self.print_logo_path = print_logo_path
