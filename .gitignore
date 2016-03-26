@@ -37,5 +37,5 @@ nosetests.xml
 # PyCharm
 .idea
 
-# test output
-temp.pdf
+.cache
+htmlcov

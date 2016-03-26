@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from random import choice, randint
 from string import digits
+
 from django.db import models
+from django.utils.six.moves import xrange
 from django.utils.timezone import now
 
-from .settings import CODE_MIN_N_DIGITS, CODE_MAX_N_DIGITS, PREFIXES, LITERATE_KEYSPACES, CODE_ALLOW_LEADING_ZEROES
+from .settings import CODE_ALLOW_LEADING_ZEROES, CODE_MAX_N_DIGITS, CODE_MIN_N_DIGITS, LITERATE_KEYSPACES, PREFIXES
 
 ###
 # --- Constants ---
@@ -23,7 +25,7 @@ CODE_STATUS_CHOICES = (
 )
 
 if PREFIXES:
-    PREFIX_CHOICES = [(p, "%s [%s]" % (p, t)) for (p, t) in sorted(PREFIXES.iteritems())]
+    PREFIX_CHOICES = [(p, "%s [%s]" % (p, t)) for (p, t) in sorted(PREFIXES.items())]
     PREFIX_MAY_BE_BLANK = False
 else:
     PREFIX_CHOICES = [("", "---")]
@@ -64,7 +66,7 @@ class Code(models.Model):
     status = models.IntegerField(choices=CODE_STATUS_CHOICES, default=UNUSED)
     used_on = models.DateTimeField(blank=True, null=True)
     used_at = models.CharField(max_length=64, blank=True, help_text=u"Station at which code was used")
-    prefix = models.CharField(max_length=16, blank=PREFIX_MAY_BE_BLANK, choices=PREFIX_CHOICES, editable=False)
+    prefix = models.CharField(max_length=16, blank=True, editable=False)
     code = models.CharField(max_length=64, unique=True, editable=False)
     literate_code = models.CharField(max_length=256, blank=True, editable=False)
     product_text = models.CharField(max_length=512, blank=True, editable=False)
@@ -117,7 +119,9 @@ class Code(models.Model):
             raise ValueError("Un-sane situation detected: initial save of code with non-virgin status!")
         if not all(c in digits for c in self.full_code):
             raise ValueError("Un-sane situation detected: full_code contains non-digits. (This might mean a contaminated prefix configuration.)")
-        if self.prefix not in PREFIXES:  # In all honesty full_clean() should notice this due to the `choices` on the field
+        if not PREFIX_MAY_BE_BLANK and not self.prefix:
+            raise ValueError("Un-sane situation detected: prefix may not be blank")
+        if self.prefix and self.prefix not in PREFIXES:
             raise ValueError("Un-sane situation detected: prefix %r is not in PREFIXES" % self.prefix)
 
     def save(self, *args, **kwargs):

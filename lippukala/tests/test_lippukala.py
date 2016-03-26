@@ -1,10 +1,17 @@
 # -*- coding: utf-8 -*-
-from django.test import TestCase
-import time
-from lippukala.models import Order, Code
-from lippukala.reports import get_code_report, CodeReportWriter
-from lippukala.settings import PREFIXES
+from __future__ import unicode_literals
+
 import random
+import time
+
+from django.conf import settings
+from django.test import TestCase
+from django.utils.six import BytesIO
+
+import pytest
+from lippukala.models import Code, Order
+from lippukala.reports import CodeReportWriter, get_code_report
+from lippukala.settings import PREFIXES
 
 
 def _create_test_order():
@@ -16,7 +23,7 @@ def _create_test_order():
         reference_number=str(int(time.time() * 10000 + random.randint(0, 35474500))),
     )
     assert order.pk
-    for x in xrange(25):
+    for x in range(25):
         prefix = str(x % 4)
         code = Code.objects.create(
             order=order,
@@ -67,28 +74,30 @@ class ReportTest(TestCase):
 
     def test_csv_reports_have_good_stuff(self):
         order = _create_test_order()
-        csv_report_data = get_code_report("csv", False)
+        csv_report_data = get_code_report("csv", False).decode(settings.DEFAULT_CHARSET)
         # We don't particularly care if we have extra orders/codes at this point, just as long
         # as the ones we just created are found
         for code in order.code_set.all():
-            self.assertTrue(code.literate_code in csv_report_data, "code %r was missing" % code)
+            assert (code.literate_code in csv_report_data), "code %r was missing" % code
 
     def test_all_report_formats_seem_to_work(self):
-        order = _create_test_order()
+        _create_test_order()
         formats = [n.split("_")[1] for n in dir(CodeReportWriter) if n.startswith("format_")]
         for format in formats:
             self.assertTrue(get_code_report(format, False, True))
             self.assertTrue(get_code_report(format, True, False))
 
 
-class PrintingTest(TestCase):
+@pytest.mark.parametrize("one_per_page", (False, True))
+@pytest.mark.django_db
+def test_printing(one_per_page):
+    from lippukala.printing import OrderPrinter
+    printer = OrderPrinter()
+    printer.ONE_TICKET_PER_PAGE = one_per_page
+    for x in xrange(3):
+        order = _create_test_order()
+        printer.process_order(order)
 
-    def test_printing(self):
-        from lippukala.printing import OrderPrinter
-        printer = OrderPrinter()
-        for x in xrange(3):
-            order = _create_test_order()
-            printer.process_order(order)
-
-        with file("temp.pdf", "wb") as outf:
-            outf.write(printer.finish())
+    outf = BytesIO()
+    outf.write(printer.finish())
+    assert outf.getvalue().startswith(b"%PDF")
