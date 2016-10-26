@@ -41,7 +41,7 @@ def validate_settings():  # pragma: no cover
         if not all(c in digits for c in prefix):
             raise ImproperlyConfigured("The prefix %r has invalid characters. Only digits are allowed." % prefix)
 
-    for prefix, literate_keyspace in LITERATE_KEYSPACES.items():
+    for prefix, literate_keyspace in list(LITERATE_KEYSPACES.items()):
         if isinstance(literate_keyspace, string_types):
             raise ImproperlyConfigured(
                 "A string (%r) was passed as the literate keyspace for prefix %r" % (literate_keyspace, prefix))

@@ -13,17 +13,17 @@ DATABASES = {
 SECRET_KEY = 'secret'
 
 LIPPUKALA_PREFIXES = {
-    "0": u"mat",
-    "1": u"nom",
-    "2": u"dog-jono",
-    "3": u"cat-jono",
+    "0": "mat",
+    "1": "nom",
+    "2": "dog-jono",
+    "3": "cat-jono",
 }
 
 LIPPUKALA_LITERATE_KEYSPACES = {
-    "0": u"hopea kulta kumi lanka muovi nahka naru pahvi rauta teräs".split(),
-    "1": u"Aino Anna Armas Eino Elisabet Helmi Hilja Ilmari Johanna Johannes Juho Lauri Maria Martta Sofia Toivo Tyyne Vilho Väinö Yrjö".split(),
-    "2": u"Murre Rekku Haukku yksi pallo".split(),
-    "3": u"Miuku Mauku Kitler kaksi neliö".split(),
+    "0": "hopea kulta kumi lanka muovi nahka naru pahvi rauta teräs".split(),
+    "1": "Aino Anna Armas Eino Elisabet Helmi Hilja Ilmari Johanna Johannes Juho Lauri Maria Martta Sofia Toivo Tyyne Vilho Väinö Yrjö".split(),
+    "2": "Murre Rekku Haukku yksi pallo".split(),
+    "3": "Miuku Mauku Kitler kaksi neliö".split(),
 }
 
 LIPPUKALA_CODE_MIN_N_DIGITS = 6

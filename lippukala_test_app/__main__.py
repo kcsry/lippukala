@@ -1,13 +1,14 @@
 import os
 import sys
+import collections
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lippukala_test_app.settings")
 
 
 def seed():
     from lippukala.tests import _create_test_order
-    for x in xrange(20):
-        print _create_test_order().pk
+    for x in range(20):
+        print(_create_test_order().pk)
 
 
 def manage():
@@ -16,7 +17,7 @@ def manage():
         func = globals().get(sys.argv[1])
     except:
         func = None
-    if func and callable(func):
+    if func and isinstance(func, collections.Callable):
         func()
     else:
         execute_from_command_line(sys.argv)

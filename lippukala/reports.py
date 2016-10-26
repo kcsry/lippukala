@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 import time
 
@@ -16,7 +16,7 @@ class CodeReportWriter(object):
         self.code_queryset = code_queryset
 
     def get_fields_iterator(self):
-        return ((code.full_code, code.literate_code, u"Käytetty %s" % code.used_on if code.used_on else "") for code in
+        return ((code.full_code, code.literate_code, "Käytetty %s" % code.used_on if code.used_on else "") for code in
                 self.code_queryset.iterator())
 
     def get_report(self, format, as_response):

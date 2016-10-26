@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import urlparse
+import urllib.parse
 
 from django.http import HttpResponse
 from django.views.generic import TemplateView
@@ -51,7 +51,7 @@ class POSView(TemplateView):
         use = (request.POST.get("use") or request.GET.get("use"))
         if not use:
             try:
-                use = urlparse.parse_qs(request.body)["use"][0]
+                use = urllib.parse.parse_qs(request.body)["use"][0]
             except:
                 pass
         if use:

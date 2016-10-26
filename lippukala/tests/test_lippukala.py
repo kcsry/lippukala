@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 import random
 import time
@@ -17,9 +17,9 @@ from lippukala.settings import PREFIXES
 def _create_test_order():
     fname = random.choice(["Teppo", "Tatu", "Tauno", "Tintti", "Taika"])
     order = Order.objects.create(
-        address_text=u"%s Testinen\nTestikatu %d\n%05d Turku\nFinland" % (fname, random.randint(1, 50), random.randint(0, 99999)),
-        free_text=u"Tervetuloa Testiconiin!",
-        comment=u"%s on kiva jätkä." % fname,
+        address_text="%s Testinen\nTestikatu %d\n%05d Turku\nFinland" % (fname, random.randint(1, 50), random.randint(0, 99999)),
+        free_text="Tervetuloa Testiconiin!",
+        comment="%s on kiva jätkä." % fname,
         reference_number=str(int(time.time() * 10000 + random.randint(0, 35474500))),
     )
     assert order.pk
@@ -94,7 +94,7 @@ def test_printing(one_per_page):
     from lippukala.printing import OrderPrinter
     printer = OrderPrinter()
     printer.ONE_TICKET_PER_PAGE = one_per_page
-    for x in xrange(3):
+    for x in range(3):
         order = _create_test_order()
         printer.process_order(order)
 
