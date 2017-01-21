@@ -6,6 +6,7 @@ import time
 
 from django.conf import settings
 from django.test import TestCase
+from django.utils.encoding import force_text
 from django.utils.six import BytesIO
 
 import pytest
@@ -23,6 +24,7 @@ def _create_test_order():
         reference_number=str(int(time.time() * 10000 + random.randint(0, 35474500))),
     )
     assert order.pk
+    assert str(order.pk) in force_text(order)
     for x in range(25):
         prefix = str(x % 4)
         code = Code.objects.create(
@@ -30,6 +32,8 @@ def _create_test_order():
             prefix=prefix,
             product_text="Lippu %d" % (x + 1)
         )
+        assert code.full_code in force_text(code)
+        assert code.literate_code in force_text(code)
     return order
 
 
@@ -94,7 +98,7 @@ def test_printing(one_per_page):
     from lippukala.printing import OrderPrinter
     printer = OrderPrinter()
     printer.ONE_TICKET_PER_PAGE = one_per_page
-    for x in xrange(3):
+    for x in range(3):
         order = _create_test_order()
         printer.process_order(order)
 
