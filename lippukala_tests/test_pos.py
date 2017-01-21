@@ -1,5 +1,5 @@
 from lippukala.models import Code
-from lippukala.tests.utils import _create_test_order
+from .utils import _create_test_order
 
 
 def test_pos_view(admin_client):

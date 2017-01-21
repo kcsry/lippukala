@@ -9,7 +9,7 @@ from django.utils.six import BytesIO
 from lippukala.models import Code, Order
 from lippukala.reports import CodeReportWriter, get_code_report
 from lippukala.settings import PREFIXES
-from lippukala.tests.utils import _create_test_order
+from .utils import _create_test_order
 
 
 class OrderCreationTest(TestCase):

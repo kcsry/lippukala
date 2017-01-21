@@ -5,7 +5,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lippukala_test_app.settings")
 
 
 def seed():
-    from lippukala.tests.utils import _create_test_order
+    from lippukala_tests.utils import _create_test_order
     for x in range(20):
         print(_create_test_order().pk)
 
