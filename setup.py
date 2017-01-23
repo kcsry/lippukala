@@ -1,13 +1,6 @@
 #!/usr/bin/env python
 
-import os
-
 from setuptools import find_packages, setup
-
-
-def requirements(filename):
-    with open(os.path.abspath(os.path.join(os.path.dirname(__file__), filename))) as f:
-        return f.readlines()
 
 setup(
     name='lippukala',
@@ -16,7 +9,11 @@ setup(
     author='Aarni Koskela',
     author_email='akx@desucon.fi',
     url='https://github.com/kcsry/lippukala',
-    packages=find_packages(),
+    packages=find_packages('.', exclude=('lippukala_test*',)),
     include_package_data=True,
-    install_requires=requirements('requirements.txt')
+    install_requires=[
+        'Django>=1.8',
+        'xlwt>0.7,<=1.1',
+        'reportlab>=2.6',
+    ],
 )

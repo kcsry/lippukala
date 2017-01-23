@@ -1,36 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import random
-import time
-
+import pytest
 from django.conf import settings
 from django.test import TestCase
 from django.utils.six import BytesIO
 
-import pytest
 from lippukala.models import Code, Order
 from lippukala.reports import CodeReportWriter, get_code_report
 from lippukala.settings import PREFIXES
-
-
-def _create_test_order():
-    fname = random.choice(["Teppo", "Tatu", "Tauno", "Tintti", "Taika"])
-    order = Order.objects.create(
-        address_text=u"%s Testinen\nTestikatu %d\n%05d Turku\nFinland" % (fname, random.randint(1, 50), random.randint(0, 99999)),
-        free_text=u"Tervetuloa Testiconiin!",
-        comment=u"%s on kiva jätkä." % fname,
-        reference_number=str(int(time.time() * 10000 + random.randint(0, 35474500))),
-    )
-    assert order.pk
-    for x in range(25):
-        prefix = str(x % 4)
-        code = Code.objects.create(
-            order=order,
-            prefix=prefix,
-            product_text="Lippu %d" % (x + 1)
-        )
-    return order
+from .utils import _create_test_order
 
 
 class OrderCreationTest(TestCase):
@@ -94,7 +73,7 @@ def test_printing(one_per_page):
     from lippukala.printing import OrderPrinter
     printer = OrderPrinter()
     printer.ONE_TICKET_PER_PAGE = one_per_page
-    for x in xrange(3):
+    for x in range(3):
         order = _create_test_order()
         printer.process_order(order)
 

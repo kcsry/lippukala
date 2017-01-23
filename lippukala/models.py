@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 from random import choice, randint
 from string import digits
 
 from django.db import models
+from django.utils.six import python_2_unicode_compatible
 from django.utils.six.moves import xrange
 from django.utils.timezone import now
 
@@ -40,6 +42,7 @@ class CantUseException(ValueError):
     pass
 
 
+@python_2_unicode_compatible
 class Order(models.Model):
 
     """ Encapsulates an order, which may contain zero or more codes.
@@ -54,10 +57,11 @@ class Order(models.Model):
     free_text = models.TextField(blank=True, help_text=u"Text printed on PDF")
     comment = models.TextField(blank=True, help_text=u"Administrative comment")
 
-    def __unicode__(self):
+    def __str__(self):
         return "LK-%08d (ref %s)" % (self.pk, self.reference_number)
 
 
+@python_2_unicode_compatible
 class Code(models.Model):
 
     """ Encapsulates a single code, belonging to an order, that may be used to claim one or more products, as described in product_text. """
@@ -74,7 +78,7 @@ class Code(models.Model):
     full_code = property(lambda self: "%s%s" % (self.prefix, self.code))
     is_used = property(lambda self: self.status == USED)
 
-    def __unicode__(self):
+    def __str__(self):
         return "Code %s (%s) (%s)" % (self.full_code, self.literate_code, self.get_status_display())
 
     def _generate_code(self):

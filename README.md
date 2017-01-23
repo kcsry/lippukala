@@ -7,12 +7,12 @@ Seksiasuja ja kissoja
 Getting started
 ---------------
 
-    virtualenv --distribute venv-lippukala
+    virtualenv venv-lippukala
     source venv-lippukala/bin/activate
 
     git clone git@github.com:kcsry/lippukala
     cd lippukala
-    python setup.py develop
+    pip install -e .[dev] -r requirements-dev.txt
 
 
 POS test mode
@@ -30,7 +30,7 @@ Copyright & license
 
     The MIT License (MIT)
 
-    Copyright (c) 2013-2014 Aarni Koskela, Santtu Pajukanta
+    Copyright (c) 2013-2017 Aarni Koskela, Santtu Pajukanta
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal

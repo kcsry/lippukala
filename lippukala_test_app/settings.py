@@ -32,6 +32,20 @@ LIPPUKALA_CODE_MAX_N_DIGITS = 10
 LIPPUKALA_PRINT_LOGO_PATH = "./fictitious_con.jpg"
 LIPPUKALA_PRINT_LOGO_SIZE_CM = (5.84, 1.5)
 
-INSTALLED_APPS = ("lippukala",)
+INSTALLED_APPS = (
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "lippukala",
+)
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "APP_DIRS": True,
+        "OPTIONS": {},
+    },
+]
+
 ROOT_URLCONF = "lippukala_test_app.urls"
 DEBUG = True
