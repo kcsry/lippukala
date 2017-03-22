@@ -1,18 +1,12 @@
 # -*- coding: utf-8 -*-
-try:
-    from urlparse import parse_qs
-except ImportError:
-    from urllib.parse import parse_qs
+
+import json
 
 from django.http import HttpResponse
+from django.utils.six.moves.urllib.parse import parse_qs
 from django.views.generic import TemplateView
 
 from lippukala.models import CantUseException, Code
-
-try:
-    import json
-except ImportError:
-    import django.utils.simplejson as json
 
 
 def serialize_code(code):
