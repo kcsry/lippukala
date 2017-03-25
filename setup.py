@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='lippukala',
-    version='1.1.1',
+    version='1.2',
     description='Desuconin ja Traconin e-lippu-jarjestelma',
     author='Aarni Koskela',
     author_email='akx@desucon.fi',
@@ -13,7 +13,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'Django>=1.8',
-        'xlwt>0.7,<=1.1',
+        'xlwt>0.7,<=1.2',
         'reportlab>=2.6',
     ],
 )
