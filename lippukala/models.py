@@ -65,7 +65,7 @@ class Order(models.Model):
 class Code(models.Model):
 
     """ Encapsulates a single code, belonging to an order, that may be used to claim one or more products, as described in product_text. """
-    order = models.ForeignKey(Order)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
     created_on = models.DateTimeField(auto_now_add=True)
     status = models.IntegerField(choices=CODE_STATUS_CHOICES, default=UNUSED)
     used_on = models.DateTimeField(blank=True, null=True)
