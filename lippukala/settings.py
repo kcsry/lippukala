@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 import os
 from string import digits
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.six import string_types
 
 
 def get_setting(name, default=None):
@@ -41,8 +39,8 @@ def validate_settings():  # pragma: no cover
         if not all(c in digits for c in prefix):
             raise ImproperlyConfigured("The prefix %r has invalid characters. Only digits are allowed." % prefix)
 
-    for prefix, literate_keyspace in LITERATE_KEYSPACES.items():
-        if isinstance(literate_keyspace, string_types):
+    for prefix, literate_keyspace in list(LITERATE_KEYSPACES.items()):
+        if isinstance(literate_keyspace, str):
             raise ImproperlyConfigured(
                 "A string (%r) was passed as the literate keyspace for prefix %r" % (literate_keyspace, prefix))
         if any(len(key) <= 1 for key in literate_keyspace) or len(set(literate_keyspace)) != len(literate_keyspace):

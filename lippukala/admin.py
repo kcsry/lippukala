@@ -1,4 +1,3 @@
-# -- encoding: UTF-8 --
 from django.contrib.admin import site
 from django.contrib.admin.options import ModelAdmin, TabularInline
 
@@ -23,7 +22,7 @@ class OrderAdmin(ModelAdmin):
 
 def order_details(code):
     return "%s (%s)" % (code.order.reference_number, code.order.address_text)
-order_details.short_description = u"Order"
+order_details.short_description = "Order"
 
 
 class CodeAdmin(ModelAdmin):

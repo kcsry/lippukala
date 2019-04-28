@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-
 import json
+from urllib.parse import parse_qs
 
 from django.http import HttpResponse
-from django.utils.six.moves.urllib.parse import parse_qs
 from django.views.generic import TemplateView
 
 from lippukala.models import CantUseException, Code

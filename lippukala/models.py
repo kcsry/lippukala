@@ -1,11 +1,7 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 from random import choice, randint
 from string import digits
 
 from django.db import models
-from django.utils.six import python_2_unicode_compatible
-from django.utils.six.moves import xrange
 from django.utils.timezone import now
 
 from .settings import CODE_ALLOW_LEADING_ZEROES, CODE_MAX_N_DIGITS, CODE_MIN_N_DIGITS, LITERATE_KEYSPACES, PREFIXES
@@ -20,10 +16,10 @@ MANUAL_INTERVENTION_REQUIRED = 2
 BEYOND_LOGIC = 3
 
 CODE_STATUS_CHOICES = (
-    (UNUSED, u"Unused"),
-    (USED, u"Used"),
-    (MANUAL_INTERVENTION_REQUIRED, u"Manual intervention required"),
-    (BEYOND_LOGIC, u"Beyond logic")
+    (UNUSED, "Unused"),
+    (USED, "Used"),
+    (MANUAL_INTERVENTION_REQUIRED, "Manual intervention required"),
+    (BEYOND_LOGIC, "Beyond logic")
 )
 
 if PREFIXES:
@@ -42,7 +38,6 @@ class CantUseException(ValueError):
     pass
 
 
-@python_2_unicode_compatible
 class Order(models.Model):
 
     """ Encapsulates an order, which may contain zero or more codes.
@@ -53,15 +48,14 @@ class Order(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now=True)
     reference_number = models.CharField(blank=True, null=True, max_length=64, unique=True, help_text="Reference number, unique")
-    address_text = models.TextField(blank=True, help_text=u"Text printed in the PDF address area")
-    free_text = models.TextField(blank=True, help_text=u"Text printed on PDF")
-    comment = models.TextField(blank=True, help_text=u"Administrative comment")
+    address_text = models.TextField(blank=True, help_text="Text printed in the PDF address area")
+    free_text = models.TextField(blank=True, help_text="Text printed on PDF")
+    comment = models.TextField(blank=True, help_text="Administrative comment")
 
     def __str__(self):
         return "LK-%08d (ref %s)" % (self.pk, self.reference_number)
 
 
-@python_2_unicode_compatible
 class Code(models.Model):
 
     """ Encapsulates a single code, belonging to an order, that may be used to claim one or more products, as described in product_text. """
@@ -69,7 +63,7 @@ class Code(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     status = models.IntegerField(choices=CODE_STATUS_CHOICES, default=UNUSED)
     used_on = models.DateTimeField(blank=True, null=True)
-    used_at = models.CharField(max_length=64, blank=True, help_text=u"Station at which code was used")
+    used_at = models.CharField(max_length=64, blank=True, help_text="Station at which code was used")
     prefix = models.CharField(max_length=16, blank=True, editable=False)
     code = models.CharField(max_length=64, unique=True, editable=False)
     literate_code = models.CharField(max_length=256, blank=True, editable=False)
@@ -83,9 +77,9 @@ class Code(models.Model):
 
     def _generate_code(self):
         qs = self.__class__.objects
-        for attempt in xrange(500):  # 500 attempts really REALLY should be enough.
+        for attempt in range(500):  # 500 attempts really REALLY should be enough.
             n_digits = randint(CODE_MIN_N_DIGITS, CODE_MAX_N_DIGITS + 1)
-            code = ("".join(choice(digits) for x in xrange(n_digits)))
+            code = ("".join(choice(digits) for x in range(n_digits)))
             if not CODE_ALLOW_LEADING_ZEROES:
                 code = code.lstrip("0")
             # Leading zeroes could have dropped digits off the code, so recheck that.

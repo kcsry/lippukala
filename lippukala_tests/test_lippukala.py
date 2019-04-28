@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from io import BytesIO
 
 import pytest
 from django.conf import settings
 from django.test import TestCase
-from django.utils.six import BytesIO
 
 from lippukala.models import Code, Order
 from lippukala.reports import CodeReportWriter, get_code_report
