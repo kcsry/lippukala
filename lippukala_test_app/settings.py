@@ -32,16 +32,36 @@ LIPPUKALA_PRINT_LOGO_SIZE_CM = (5.84, 1.5)
 
 INSTALLED_APPS = (
     "django.contrib.auth",
+    "django.contrib.admin",
     "django.contrib.contenttypes",
+    "django.contrib.messages",
     "django.contrib.sessions",
     "lippukala",
+)
+
+MIDDLEWARE = (
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+)
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
 )
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "APP_DIRS": True,
-        "OPTIONS": {},
+        "OPTIONS": {
+            'context_processors': (
+                'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.request',
+                'django.contrib.messages.context_processors.messages',
+            ),
+        },
     },
 ]
 
