@@ -26,6 +26,14 @@ PRINT_LOGO_PATH = get_setting("PRINT_LOGO_PATH")
 PRINT_LOGO_SIZE_CM = get_setting("PRINT_LOGO_SIZE_CM")
 
 
+if PREFIXES:
+    PREFIX_CHOICES = [(p, "%s [%s]" % (p, t)) for (p, t) in sorted(PREFIXES.items())]
+    PREFIX_MAY_BE_BLANK = False
+else:
+    PREFIX_CHOICES = [("", "---")]
+    PREFIX_MAY_BE_BLANK = True
+
+
 def validate_settings():  # pragma: no cover
     key_lengths = [len(k) for k in PREFIXES]
     if key_lengths and not all(k == key_lengths[0] for k in key_lengths):

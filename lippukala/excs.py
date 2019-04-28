@@ -1,0 +1,2 @@
+class CantUseException(ValueError):
+    pass

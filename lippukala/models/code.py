@@ -1,59 +1,13 @@
-from random import choice, randint
+from random import randint, choice
 from string import digits
 
 from django.db import models
 from django.utils.timezone import now
 
-from .settings import CODE_ALLOW_LEADING_ZEROES, CODE_MAX_N_DIGITS, CODE_MIN_N_DIGITS, LITERATE_KEYSPACES, PREFIXES
-
-###
-# --- Constants ---
-###
-
-UNUSED = 0
-USED = 1
-MANUAL_INTERVENTION_REQUIRED = 2
-BEYOND_LOGIC = 3
-
-CODE_STATUS_CHOICES = (
-    (UNUSED, "Unused"),
-    (USED, "Used"),
-    (MANUAL_INTERVENTION_REQUIRED, "Manual intervention required"),
-    (BEYOND_LOGIC, "Beyond logic")
-)
-
-if PREFIXES:
-    PREFIX_CHOICES = [(p, "%s [%s]" % (p, t)) for (p, t) in sorted(PREFIXES.items())]
-    PREFIX_MAY_BE_BLANK = False
-else:
-    PREFIX_CHOICES = [("", "---")]
-    PREFIX_MAY_BE_BLANK = True
-
-###
-# --- Models ---
-###
-
-
-class CantUseException(ValueError):
-    pass
-
-
-class Order(models.Model):
-
-    """ Encapsulates an order, which may contain zero or more codes.
-
-    :var event: An (optional) event identifier for this order. May be used at the client app's discretion.
-    """
-    event = models.CharField(max_length=32, blank=True)
-    created_on = models.DateTimeField(auto_now_add=True)
-    modified_on = models.DateTimeField(auto_now=True)
-    reference_number = models.CharField(blank=True, null=True, max_length=64, unique=True, help_text="Reference number, unique")
-    address_text = models.TextField(blank=True, help_text="Text printed in the PDF address area")
-    free_text = models.TextField(blank=True, help_text="Text printed on PDF")
-    comment = models.TextField(blank=True, help_text="Administrative comment")
-
-    def __str__(self):
-        return "LK-%08d (ref %s)" % (self.pk, self.reference_number)
+from lippukala.consts import CODE_STATUS_CHOICES, UNUSED, USED
+from lippukala.excs import CantUseException
+from lippukala.models import Order
+import lippukala.settings as settings
 
 
 class Code(models.Model):
@@ -78,19 +32,19 @@ class Code(models.Model):
     def _generate_code(self):
         qs = self.__class__.objects
         for attempt in range(500):  # 500 attempts really REALLY should be enough.
-            n_digits = randint(CODE_MIN_N_DIGITS, CODE_MAX_N_DIGITS + 1)
+            n_digits = randint(settings.CODE_MIN_N_DIGITS, settings.CODE_MAX_N_DIGITS + 1)
             code = ("".join(choice(digits) for x in range(n_digits)))
-            if not CODE_ALLOW_LEADING_ZEROES:
+            if not settings.CODE_ALLOW_LEADING_ZEROES:
                 code = code.lstrip("0")
             # Leading zeroes could have dropped digits off the code, so recheck that.
-            if CODE_MIN_N_DIGITS <= len(code) <= CODE_MAX_N_DIGITS:
+            if settings.CODE_MIN_N_DIGITS <= len(code) <= settings.CODE_MAX_N_DIGITS:
                 if not qs.filter(code=code).exists():
                     return code
 
         raise ValueError("Unable to find an unused code! Is the keyspace exhausted?")
 
     def _generate_literate_code(self):
-        keyspace = (LITERATE_KEYSPACES.get(self.prefix) or LITERATE_KEYSPACES.get(None))
+        keyspace = (settings.LITERATE_KEYSPACES.get(self.prefix) or settings.LITERATE_KEYSPACES.get(None))
 
         if not keyspace:  # When absolutely no keyspaces can be found, assume (prefix+code) will do
             return self.full_code
@@ -106,7 +60,7 @@ class Code(models.Model):
         bits = bits[::-1]  # We have to reverse `bits` to get the least significant digit to be the first word.
 
         if self.prefix:  # Oh -- and if we had a prefix, add its literate counterpart now.
-            bits.insert(0, PREFIXES[self.prefix])
+            bits.insert(0, settings.PREFIXES[self.prefix])
 
         return " ".join(bits).strip()
 
@@ -117,9 +71,9 @@ class Code(models.Model):
             raise ValueError("Un-sane situation detected: initial save of code with non-virgin status!")
         if not all(c in digits for c in self.full_code):
             raise ValueError("Un-sane situation detected: full_code contains non-digits. (This might mean a contaminated prefix configuration.)")
-        if not PREFIX_MAY_BE_BLANK and not self.prefix:
+        if not settings.PREFIX_MAY_BE_BLANK and not self.prefix:
             raise ValueError("Un-sane situation detected: prefix may not be blank")
-        if self.prefix and self.prefix not in PREFIXES:
+        if self.prefix and self.prefix not in settings.PREFIXES:
             raise ValueError("Un-sane situation detected: prefix %r is not in PREFIXES" % self.prefix)
 
     def save(self, *args, **kwargs):

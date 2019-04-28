@@ -4,7 +4,8 @@ from urllib.parse import parse_qs
 from django.http import HttpResponse
 from django.views.generic import TemplateView
 
-from lippukala.models import CantUseException, Code
+from lippukala.excs import CantUseException
+from lippukala.models import Code
 
 
 def serialize_code(code):
