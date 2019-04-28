@@ -1,13 +1,12 @@
 lippukala
 =========
 
-Seksiasuja ja kissoja
-
+App for managing e-tickets for conventions.
 
 Getting started
 ---------------
 
-    virtualenv venv-lippukala
+    python3 -m venv venv-lippukala
     source venv-lippukala/bin/activate
 
     git clone git@github.com:kcsry/lippukala
@@ -30,7 +29,7 @@ Copyright & license
 
     The MIT License (MIT)
 
-    Copyright (c) 2013-2017 Aarni Koskela, Santtu Pajukanta
+    Copyright (c) 2013-2019 Aarni Koskela, Santtu Pajukanta
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
