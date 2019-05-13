@@ -1,4 +1,5 @@
 sudo: false
+dist: xenial
 language: python
 cache:
   directories:
@@ -6,9 +7,8 @@ cache:
 env:
 - DEBUG=1
 python:
-  - "2.7"
-  - "3.4"
   - "3.5"
+  - "3.6"
 install:
   - pip install -U pip
   - pip install tox-travis -r requirements-dev.txt

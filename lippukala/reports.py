@@ -1,22 +1,19 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import time
+from io import BytesIO
 
 from django.conf import settings
 from django.http import HttpResponse
-from django.utils.six import BytesIO
 
 from lippukala.models import Code
 
 
-class CodeReportWriter(object):
+class CodeReportWriter:
 
     def __init__(self, code_queryset):
         self.code_queryset = code_queryset
 
     def get_fields_iterator(self):
-        return ((code.full_code, code.literate_code, u"Käytetty %s" % code.used_on if code.used_on else "") for code in
+        return ((code.full_code, code.literate_code, "Käytetty %s" % code.used_on if code.used_on else "") for code in
                 self.code_queryset.iterator())
 
     def get_report(self, format, as_response):

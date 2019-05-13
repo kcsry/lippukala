@@ -1,12 +1,11 @@
-# -*- coding: utf-8 -*-
-
 import json
+from urllib.parse import parse_qs
 
 from django.http import HttpResponse
-from django.utils.six.moves.urllib.parse import parse_qs
 from django.views.generic import TemplateView
 
-from lippukala.models import CantUseException, Code
+from lippukala.excs import CantUseException
+from lippukala.models import Code
 
 
 def serialize_code(code):
@@ -52,12 +51,12 @@ class POSView(TemplateView):
             except:
                 pass
         if use:
-            station = None
+            station = "n/a"
             try:
                 station = request.user.username
             except:
                 pass
-            station = (station or request.POST.get("station") or request.GET.get("station") or "(n/a)")
+            station = (request.POST.get("station") or request.GET.get("station") or station)
             ids = [int(s, 10) for s in use.split(",")]
             codes = []
             qs = self.get_valid_codes(request)

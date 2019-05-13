@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 import contextlib
-
-from django.utils.six import BytesIO, text_type
+from io import BytesIO
 
 from lippukala.settings import PRINT_LOGO_PATH, PRINT_LOGO_SIZE_CM
 from reportlab.graphics.barcode import createBarcodeDrawing
@@ -10,7 +8,7 @@ from reportlab.lib.units import cm, mm
 from reportlab.pdfgen.canvas import Canvas
 
 
-class Bold(text_type):
+class Bold(str):
     pass
 
 
@@ -40,7 +38,7 @@ def save_state(context):
         context.restoreState()
 
 
-class OrderPrinter(object):
+class OrderPrinter:
     PAGE_WIDTH = 21.0 * cm
     PAGE_HEIGHT = 29.7 * cm
     PAGE_MARGIN_Y = 20 * mm
@@ -184,7 +182,7 @@ class OrderPrinter(object):
             y = draw_multiline(
                 self.canvas, self.INTRA_TICKET_X_MARGIN, 11 * mm, 9, 12,
                 [
-                    u"%s \u2014 %s" % (code.product_text, code.full_code),
+                    "%s \u2014 %s" % (code.product_text, code.full_code),
                     code.literate_code
                 ]
             )
