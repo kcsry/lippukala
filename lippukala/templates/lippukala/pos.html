@@ -153,6 +153,17 @@ function syncUseQueue() {
     }
 }
 
+function debounce(fn, delay) {
+    var timer = null;
+    return function() {
+        var clear = function() { timer = null; }
+        if (timer === null) { fn.apply(this, arguments); }
+        else { arguments[0].preventDefault(); }
+        window.clearTimeout(timer);
+        timer = window.setTimeout(clear, delay);
+    };
+}
+
 function init() {
     download();
     setInterval(download, (50 + Math.random() * 20) * 1000);
@@ -161,7 +172,7 @@ function init() {
     codeInput = document.getElementById("code");
     statusDiv = document.getElementById("status");
     codeInput.addEventListener("input", keyPress, true);
-    document.getElementById("codeform").addEventListener("submit", formSubmit, true);
+    document.getElementById("codeform").addEventListener("submit", debounce(formSubmit, 250), true);
 }
 </script>
 <style type="text/css">
