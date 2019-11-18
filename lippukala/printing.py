@@ -182,7 +182,7 @@ class OrderPrinter:
             y = draw_multiline(
                 self.canvas, self.INTRA_TICKET_X_MARGIN, 11 * mm, 9, 12,
                 [
-                    "%s \u2014 %s" % (code.product_text, code.full_code),
+                    "{} \u2014 {}".format(code.product_text, code.full_code),
                     code.literate_code
                 ]
             )

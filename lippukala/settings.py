@@ -14,7 +14,7 @@ def get_integer_setting(name, default=0):
         value = get_setting(name, default)
         return int(value)
     except ValueError:  # pragma: no cover
-        raise ImproperlyConfigured("LIPPUKALA_%s must be an integer (got %r)" % (name, value))
+        raise ImproperlyConfigured("LIPPUKALA_{} must be an integer (got {!r})".format(name, value))
 
 
 PREFIXES = get_setting("PREFIXES", {})
@@ -27,7 +27,7 @@ PRINT_LOGO_SIZE_CM = get_setting("PRINT_LOGO_SIZE_CM")
 
 
 if PREFIXES:
-    PREFIX_CHOICES = [(p, "%s [%s]" % (p, t)) for (p, t) in sorted(PREFIXES.items())]
+    PREFIX_CHOICES = [(p, "{} [{}]".format(p, t)) for (p, t) in sorted(PREFIXES.items())]
     PREFIX_MAY_BE_BLANK = False
 else:
     PREFIX_CHOICES = [("", "---")]
@@ -50,7 +50,7 @@ def validate_settings():  # pragma: no cover
     for prefix, literate_keyspace in list(LITERATE_KEYSPACES.items()):
         if isinstance(literate_keyspace, str):
             raise ImproperlyConfigured(
-                "A string (%r) was passed as the literate keyspace for prefix %r" % (literate_keyspace, prefix))
+                "A string ({!r}) was passed as the literate keyspace for prefix {!r}".format(literate_keyspace, prefix))
         if any(len(key) <= 1 for key in literate_keyspace) or len(set(literate_keyspace)) != len(literate_keyspace):
             raise ImproperlyConfigured("The literate keyspace for prefix %r has invalid or duplicate entries." % prefix)
 

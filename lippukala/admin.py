@@ -21,7 +21,7 @@ class OrderAdmin(ModelAdmin):
 
 
 def order_details(code):
-    return "%s (%s)" % (code.order.reference_number, code.order.address_text)
+    return "{} ({})".format(code.order.reference_number, code.order.address_text)
 order_details.short_description = "Order"
 
 

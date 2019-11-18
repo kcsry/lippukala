@@ -23,11 +23,11 @@ class Code(models.Model):
     literate_code = models.CharField(max_length=256, blank=True, editable=False)
     product_text = models.CharField(max_length=512, blank=True, editable=False)
 
-    full_code = property(lambda self: "%s%s" % (self.prefix, self.code))
+    full_code = property(lambda self: "{}{}".format(self.prefix, self.code))
     is_used = property(lambda self: self.status == USED)
 
     def __str__(self):
-        return "Code %s (%s) (%s)" % (self.full_code, self.literate_code, self.get_status_display())
+        return "Code {} ({}) ({})".format(self.full_code, self.literate_code, self.get_status_display())
 
     def _generate_code(self):
         qs = self.__class__.objects
