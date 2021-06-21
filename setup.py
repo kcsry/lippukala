@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='lippukala',
-    version='1.2.1',
+    version='2.0.0',
     description='Desuconin ja Traconin e-lippu-jarjestelma',
     author='Aarni Koskela',
     author_email='akx@desucon.fi',
