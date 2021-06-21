@@ -10,7 +10,7 @@ def _create_test_order():
     order = Order.objects.create(
         address_text="%s Testinen\nTestikatu %d\n%05d Turku\nFinland" % (fname, random.randint(1, 50), random.randint(0, 99999)),
         free_text="Tervetuloa Testiconiin!",
-        comment="%s on kiva jätkä." % fname,
+        comment=f"{fname} on kiva jätkä.",
         reference_number=str(int(time.time() * 10000 + random.randint(0, 35474500))),
     )
     assert order.pk

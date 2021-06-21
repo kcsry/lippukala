@@ -6,7 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 
 def get_setting(name, default=None):
-    return getattr(settings, "LIPPUKALA_%s" % name, default)
+    return getattr(settings, f"LIPPUKALA_{name}", default)
 
 
 def get_integer_setting(name, default=0):
@@ -14,7 +14,7 @@ def get_integer_setting(name, default=0):
         value = get_setting(name, default)
         return int(value)
     except ValueError:  # pragma: no cover
-        raise ImproperlyConfigured("LIPPUKALA_{} must be an integer (got {!r})".format(name, value))
+        raise ImproperlyConfigured(f"LIPPUKALA_{name} must be an integer (got {value!r})")
 
 
 PREFIXES = get_setting("PREFIXES", {})
@@ -27,7 +27,7 @@ PRINT_LOGO_SIZE_CM = get_setting("PRINT_LOGO_SIZE_CM")
 
 
 if PREFIXES:
-    PREFIX_CHOICES = [(p, "{} [{}]".format(p, t)) for (p, t) in sorted(PREFIXES.items())]
+    PREFIX_CHOICES = [(p, f"{p} [{t}]") for (p, t) in sorted(PREFIXES.items())]
     PREFIX_MAY_BE_BLANK = False
 else:
     PREFIX_CHOICES = [("", "---")]
@@ -45,20 +45,20 @@ def validate_settings():  # pragma: no cover
 
     for prefix in PREFIXES:
         if not all(c in digits for c in prefix):
-            raise ImproperlyConfigured("The prefix %r has invalid characters. Only digits are allowed." % prefix)
+            raise ImproperlyConfigured(f"The prefix {prefix!r} has invalid characters. Only digits are allowed.")
 
     for prefix, literate_keyspace in list(LITERATE_KEYSPACES.items()):
         if isinstance(literate_keyspace, str):
             raise ImproperlyConfigured(
-                "A string ({!r}) was passed as the literate keyspace for prefix {!r}".format(literate_keyspace, prefix))
+                f"A string ({literate_keyspace!r}) was passed as the literate keyspace for prefix {prefix!r}")
         if any(len(key) <= 1 for key in literate_keyspace) or len(set(literate_keyspace)) != len(literate_keyspace):
-            raise ImproperlyConfigured("The literate keyspace for prefix %r has invalid or duplicate entries." % prefix)
+            raise ImproperlyConfigured(f"The literate keyspace for prefix {prefix!r} has invalid or duplicate entries.")
 
     if PRINT_LOGO_PATH:
         if not os.path.isfile(PRINT_LOGO_PATH):
-            raise ImproperlyConfigured("PRINT_LOGO_PATH was defined, but does not exist (%r)" % PRINT_LOGO_PATH)
+            raise ImproperlyConfigured(f"PRINT_LOGO_PATH was defined, but does not exist ({PRINT_LOGO_PATH!r})")
         if not all(float(s) > 0 for s in PRINT_LOGO_SIZE_CM):
-            raise ImproperlyConfigured("PRINT_LOGO_SIZE_CM values not valid: %r" % PRINT_LOGO_SIZE_CM)
+            raise ImproperlyConfigured(f"PRINT_LOGO_SIZE_CM values not valid: {PRINT_LOGO_SIZE_CM!r}")
 
 
 validate_settings()

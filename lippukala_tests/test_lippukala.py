@@ -49,7 +49,7 @@ def test_csv_reports_have_good_stuff():
     # We don't particularly care if we have extra orders/codes at this point, just as long
     # as the ones we just created are found
     for code in order.code_set.all():
-        assert (code.literate_code in csv_report_data), "code %r was missing" % code
+        assert (code.literate_code in csv_report_data), f"code {code!r} was missing"
 
 
 def test_all_report_formats_seem_to_work():

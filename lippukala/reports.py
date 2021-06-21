@@ -13,15 +13,15 @@ class CodeReportWriter:
         self.code_queryset = code_queryset
 
     def get_fields_iterator(self):
-        return ((code.full_code, code.literate_code, "Käytetty %s" % code.used_on if code.used_on else "") for code in
+        return ((code.full_code, code.literate_code, f"Käytetty {code.used_on}" if code.used_on else "") for code in
                 self.code_queryset.iterator())
 
     def get_report(self, format, as_response):
         format = str(format).lower()
         filename = "code_report_%d.%s" % (time.time(), format)
-        format_writer = getattr(self, "format_%s_report" % format, None)
+        format_writer = getattr(self, f"format_{format}_report", None)
         if not format_writer:  # pragma: no cover
-            raise ValueError("Unknown format: %r" % format)
+            raise ValueError(f"Unknown format: {format!r}")
         return format_writer(filename=filename, as_response=as_response)
 
     def format_xls_report(self, filename, as_response):
@@ -39,18 +39,18 @@ class CodeReportWriter:
 
         if as_response:
             response = HttpResponse(sio.getvalue(), content_type="application/vnd.ms-excel")
-            response["Content-Disposition"] = "attachment; filename=%s" % filename
+            response["Content-Disposition"] = f"attachment; filename={filename}"
             return response
         else:
             return sio.getvalue()
 
     def _format_delimited_report(self, filename, as_response, field_delimiter=";", record_delimiter="\r\n"):
-        content_type = "text/csv; charset=%s" % settings.DEFAULT_CHARSET
+        content_type = f"text/csv; charset={settings.DEFAULT_CHARSET}"
 
         iterator = (field_delimiter.join(fields) + record_delimiter for fields in self.get_fields_iterator())
         if as_response:
             response = HttpResponse(iterator, content_type=content_type)
-            response["Content-Disposition"] = "attachment; filename=%s" % filename
+            response["Content-Disposition"] = f"attachment; filename={filename}"
             return response
         else:
             return ("".join(iterator)).encode(settings.DEFAULT_CHARSET)
@@ -69,7 +69,7 @@ class CodeReportWriter:
 
         if as_response:
             response = HttpResponse(sio.getvalue(), content_type="application/pdf")
-            response["Content-Disposition"] = "attachment; filename=%s" % filename
+            response["Content-Disposition"] = f"attachment; filename={filename}"
             return response
         else:
             return sio.getvalue()
