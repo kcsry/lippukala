@@ -68,8 +68,8 @@ class OrderPrinter:
 
     def get_heading_texts(self, order, n_orders):
         return [
-            (("Viitenumero: %s" % order.reference_number) if order.reference_number else None),
-            "Tilausaika: %s" % order.created_on.strftime("%d.%m.%Y klo %H:%M"),
+            (f"Viitenumero: {order.reference_number}" if order.reference_number else None),
+            f"Tilausaika: {order.created_on.strftime('%d.%m.%Y klo %H:%M')}",
         ]
 
     def get_free_text(self, order):
@@ -108,7 +108,7 @@ class OrderPrinter:
         )
 
         if self.print_logo_path:
-            image_width, image_height = [n * cm for n in self.print_logo_size_cm]
+            image_width, image_height = (n * cm for n in self.print_logo_size_cm)
             canvas.drawImage(
                 self.print_logo_path,
                 115 * mm, y0 + 1 * mm,
@@ -144,7 +144,7 @@ class OrderPrinter:
 
             page_id_text = "Sivu %d" % self.canvas._pageNumber
             if order.reference_number:
-                page_id_text += " - Viitenumero: %s" % order.reference_number
+                page_id_text += f" - Viitenumero: {order.reference_number}"
             self.canvas.drawString(self.PAGE_MARGIN_X, self.PAGE_HEIGHT - self.PAGE_MARGIN_Y, page_id_text)
             self.draw_y = self._align_draw_y(self.PAGE_HEIGHT - self.PAGE_MARGIN_Y - 10 * mm)
 
@@ -182,7 +182,7 @@ class OrderPrinter:
             y = draw_multiline(
                 self.canvas, self.INTRA_TICKET_X_MARGIN, 11 * mm, 9, 12,
                 [
-                    "{} \u2014 {}".format(code.product_text, code.full_code),
+                    f"{code.product_text} \u2014 {code.full_code}",
                     code.literate_code
                 ]
             )

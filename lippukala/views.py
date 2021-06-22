@@ -40,7 +40,7 @@ class POSView(TemplateView):
     def get(self, request, *args, **kwargs):
         if request.GET.get("json"):
             return self.get_json(request)
-        return super(POSView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         json_data = '{"what": true}'

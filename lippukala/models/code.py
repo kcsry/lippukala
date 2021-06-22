@@ -23,11 +23,11 @@ class Code(models.Model):
     literate_code = models.CharField(max_length=256, blank=True, editable=False)
     product_text = models.CharField(max_length=512, blank=True, editable=False)
 
-    full_code = property(lambda self: "{}{}".format(self.prefix, self.code))
+    full_code = property(lambda self: f"{self.prefix}{self.code}")
     is_used = property(lambda self: self.status == USED)
 
     def __str__(self):
-        return "Code {} ({}) ({})".format(self.full_code, self.literate_code, self.get_status_display())
+        return f"Code {self.full_code} ({self.literate_code}) ({self.get_status_display()})"
 
     def _generate_code(self):
         qs = self.__class__.objects
@@ -74,7 +74,7 @@ class Code(models.Model):
         if not settings.PREFIX_MAY_BE_BLANK and not self.prefix:
             raise ValueError("Un-sane situation detected: prefix may not be blank")
         if self.prefix and self.prefix not in settings.PREFIXES:
-            raise ValueError("Un-sane situation detected: prefix %r is not in PREFIXES" % self.prefix)
+            raise ValueError(f"Un-sane situation detected: prefix {self.prefix!r} is not in PREFIXES")
 
     def save(self, *args, **kwargs):
         if not self.code:
@@ -85,11 +85,11 @@ class Code(models.Model):
 
         self._check_sanity()
 
-        return super(Code, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def set_used(self, save=True, used_at=""):
         if self.status != UNUSED:
-            raise CantUseException("Can't use a code in %s status!" % self.get_status_display())
+            raise CantUseException(f"Can't use a code in {self.get_status_display()} status!")
         self.status = USED
         self.used_on = now()
         self.used_at = used_at

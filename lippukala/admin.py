@@ -21,7 +21,7 @@ class OrderAdmin(ModelAdmin):
 
 
 def order_details(code):
-    return "{} ({})".format(code.order.reference_number, code.order.address_text)
+    return f"{code.order.reference_number} ({code.order.address_text})"
 order_details.short_description = "Order"
 
 
@@ -33,7 +33,7 @@ class CodeAdmin(ModelAdmin):
     ordering = ["code"]
 
     def get_queryset(self, request):
-        qs = super(CodeAdmin, self).get_queryset(request)
+        qs = super().get_queryset(request)
         qs = qs.select_related("order")
         return qs
 
