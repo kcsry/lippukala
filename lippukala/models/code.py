@@ -7,7 +7,6 @@ from django.utils.timezone import now
 import lippukala.settings as settings
 from lippukala.consts import CODE_STATUS_CHOICES, UNUSED, USED
 from lippukala.excs import CantUseException
-from lippukala.models import Order
 
 
 class Code(models.Model):
@@ -17,7 +16,7 @@ class Code(models.Model):
     as described in product_text.
     """
 
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order = models.ForeignKey("lippukala.Order", on_delete=models.CASCADE)
     created_on = models.DateTimeField(auto_now_add=True)
     status = models.IntegerField(choices=CODE_STATUS_CHOICES, default=UNUSED)
     used_on = models.DateTimeField(blank=True, null=True)
