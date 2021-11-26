@@ -24,7 +24,7 @@ def order_details(code):
     return f"{code.order.reference_number} ({code.order.address_text})"
 
 
-order_details.short_description = "Order"
+order_details.short_description = "Order"  # type: ignore[attr-defined]
 
 
 class CodeAdmin(ModelAdmin):
