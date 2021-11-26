@@ -1,4 +1,4 @@
-name: Test
+name: CI
 'on':
   push:
     branches:
@@ -7,13 +7,12 @@ name: Test
     branches:
       - master
 jobs:
-  Build:
+  Test:
     env:
       DEBUG: '1'
-    runs-on: '${{ matrix.os }}'
+    runs-on: 'ubuntu-20.04'
     strategy:
       matrix:
-        os: ['ubuntu-18.04']
         python-version: ['3.6', '3.7', '3.8', '3.9']
     steps:
       - name: 'Set up Python ${{ matrix.python-version }}'
@@ -23,4 +22,4 @@ jobs:
       - uses: actions/checkout@v2
       - run: pip install tox-gh-actions tox
       - run: tox
-      - run: 'bash <(curl -s https://codecov.io/bash)'
+      - uses: codecov/codecov-action@v2
