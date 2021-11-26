@@ -22,6 +22,8 @@ class OrderAdmin(ModelAdmin):
 
 def order_details(code):
     return f"{code.order.reference_number} ({code.order.address_text})"
+
+
 order_details.short_description = "Order"
 
 
@@ -42,6 +44,7 @@ class CodeAdmin(ModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
 
 site.register(Order, OrderAdmin)
 site.register(Code, CodeAdmin)

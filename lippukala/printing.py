@@ -26,7 +26,7 @@ def draw_tabular(canvas, x0, y0, font_size, leading, x_offsets, lines):
 
 
 def draw_multiline(canvas, x0, y0, font_size, leading, lines):
-    return draw_tabular(canvas, x0, y0, font_size, leading, (0,), ((l,) for l in lines if l is not None))
+    return draw_tabular(canvas, x0, y0, font_size, leading, (0,), ((line,) for line in lines if line is not None))
 
 
 @contextlib.contextmanager
@@ -179,7 +179,7 @@ class OrderPrinter:
 
             draw_on_pdf(qr_barcode, self.canvas, ticket_width - self.INTRA_TICKET_X_MARGIN - qr_barcode_size, 3 * mm)
 
-            y = draw_multiline(
+            draw_multiline(
                 self.canvas, self.INTRA_TICKET_X_MARGIN, 11 * mm, 9, 12,
                 [
                     f"{code.product_text} \u2014 {code.full_code}",

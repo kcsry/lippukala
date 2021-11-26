@@ -48,13 +48,13 @@ class POSView(TemplateView):
         if not use:
             try:
                 use = parse_qs(request.body)["use"][0]
-            except:
+            except Exception:
                 pass
         if use:
             station = "n/a"
             try:
                 station = request.user.username
-            except:
+            except Exception:
                 pass
             station = (request.POST.get("station") or request.GET.get("station") or station)
             ids = [int(s, 10) for s in use.split(",")]

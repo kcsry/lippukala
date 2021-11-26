@@ -16,7 +16,7 @@ def manage():
     from django.core.management import execute_from_command_line
     try:
         func = globals().get(sys.argv[1])
-    except:
+    except IndexError:
         func = None
     if func and callable(func):
         func()
