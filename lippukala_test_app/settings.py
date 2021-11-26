@@ -2,13 +2,13 @@ import os
 import tempfile
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(tempfile.gettempdir(), "lippukala_test.sqlite3"),
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(tempfile.gettempdir(), "lippukala_test.sqlite3"),
     }
 }
 
-SECRET_KEY = 'secret'
+SECRET_KEY = "secret"
 
 LIPPUKALA_PREFIXES = {
     "0": "mat",
@@ -19,7 +19,10 @@ LIPPUKALA_PREFIXES = {
 
 LIPPUKALA_LITERATE_KEYSPACES = {
     "0": "hopea kulta kumi lanka muovi nahka naru pahvi rauta teräs".split(),
-    "1": "Aino Anna Armas Eino Elisabet Helmi Hilja Ilmari Johanna Johannes Juho Lauri Maria Martta Sofia Toivo Tyyne Vilho Väinö Yrjö".split(),
+    "1": (
+        "Aino Anna Armas Eino Elisabet Helmi Hilja Ilmari Johanna Johannes "
+        "Juho Lauri Maria Martta Sofia Toivo Tyyne Vilho Väinö Yrjö"
+    ).split(),
     "2": "Murre Rekku Haukku yksi pallo".split(),
     "3": "Miuku Mauku Kitler kaksi neliö".split(),
 }
@@ -40,26 +43,24 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE = (
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
 )
 
-AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
-)
+AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "APP_DIRS": True,
         "OPTIONS": {
-            'context_processors': (
-                'django.contrib.auth.context_processors.auth',
-                'django.template.context_processors.request',
-                'django.contrib.messages.context_processors.messages',
+            "context_processors": (
+                "django.contrib.auth.context_processors.auth",
+                "django.template.context_processors.request",
+                "django.contrib.messages.context_processors.messages",
             ),
         },
     },

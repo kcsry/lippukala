@@ -7,5 +7,5 @@ CODE_STATUS_CHOICES = (
     (UNUSED, "Unused"),
     (USED, "Used"),
     (MANUAL_INTERVENTION_REQUIRED, "Manual intervention required"),
-    (BEYOND_LOGIC, "Beyond logic")
+    (BEYOND_LOGIC, "Beyond logic"),
 )
