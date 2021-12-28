@@ -1,23 +1,28 @@
-from random import randint, choice
+from random import choice, randint
 from string import digits
 
 from django.db import models
 from django.utils.timezone import now
 
+import lippukala.settings as settings
 from lippukala.consts import CODE_STATUS_CHOICES, UNUSED, USED
 from lippukala.excs import CantUseException
-from lippukala.models import Order
-import lippukala.settings as settings
 
 
 class Code(models.Model):
+    """
+    Encapsulates a single code, belonging to an order,
+    that may be used to claim one or more products,
+    as described in product_text.
+    """
 
-    """ Encapsulates a single code, belonging to an order, that may be used to claim one or more products, as described in product_text. """
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order = models.ForeignKey("lippukala.Order", on_delete=models.CASCADE)
     created_on = models.DateTimeField(auto_now_add=True)
     status = models.IntegerField(choices=CODE_STATUS_CHOICES, default=UNUSED)
     used_on = models.DateTimeField(blank=True, null=True)
-    used_at = models.CharField(max_length=64, blank=True, help_text="Station at which code was used")
+    used_at = models.CharField(
+        max_length=64, blank=True, help_text="Station at which code was used"
+    )
     prefix = models.CharField(max_length=16, blank=True, editable=False)
     code = models.CharField(max_length=64, unique=True, editable=False)
     literate_code = models.CharField(max_length=256, blank=True, editable=False)
@@ -33,7 +38,7 @@ class Code(models.Model):
         qs = self.__class__.objects
         for attempt in range(500):  # 500 attempts really REALLY should be enough.
             n_digits = randint(settings.CODE_MIN_N_DIGITS, settings.CODE_MAX_N_DIGITS + 1)
-            code = ("".join(choice(digits) for x in range(n_digits)))
+            code = "".join(choice(digits) for x in range(n_digits))
             if not settings.CODE_ALLOW_LEADING_ZEROES:
                 code = code.lstrip("0")
             # Leading zeroes could have dropped digits off the code, so recheck that.
@@ -44,9 +49,11 @@ class Code(models.Model):
         raise ValueError("Unable to find an unused code! Is the keyspace exhausted?")
 
     def _generate_literate_code(self):
-        keyspace = (settings.LITERATE_KEYSPACES.get(self.prefix) or settings.LITERATE_KEYSPACES.get(None))
+        default_literate_keyspace = settings.LITERATE_KEYSPACES.get(None)
+        keyspace = settings.LITERATE_KEYSPACES.get(self.prefix) or default_literate_keyspace
 
-        if not keyspace:  # When absolutely no keyspaces can be found, assume (prefix+code) will do
+        # When absolutely no keyspaces can be found, assume (prefix+code) will do
+        if not keyspace:
             return self.full_code
 
         bits = []
@@ -57,24 +64,35 @@ class Code(models.Model):
             val, digit = divmod(val, n)
             bits.append(keyspace[digit])
 
-        bits = bits[::-1]  # We have to reverse `bits` to get the least significant digit to be the first word.
+        # We have to reverse `bits` to get the least significant digit to be the first word.
+        bits = bits[::-1]
 
-        if self.prefix:  # Oh -- and if we had a prefix, add its literate counterpart now.
+        # Oh -- and if we had a prefix, add its literate counterpart now.
+        if self.prefix:
             bits.insert(0, settings.PREFIXES[self.prefix])
 
         return " ".join(bits).strip()
 
     def _check_sanity(self):
         if self.used_on and self.status != USED:
-            raise ValueError("Un-sane situation detected: saving Code with used status and no usage date")
+            raise ValueError(
+                "Un-sane situation detected: saving Code with used status and no usage date"
+            )
         if self.status != UNUSED and not self.pk:
-            raise ValueError("Un-sane situation detected: initial save of code with non-virgin status!")
+            raise ValueError(
+                "Un-sane situation detected: initial save of code with non-virgin status!"
+            )
         if not all(c in digits for c in self.full_code):
-            raise ValueError("Un-sane situation detected: full_code contains non-digits. (This might mean a contaminated prefix configuration.)")
+            raise ValueError(
+                "Un-sane situation detected: full_code contains non-digits. "
+                "(This might mean a contaminated prefix configuration.)"
+            )
         if not settings.PREFIX_MAY_BE_BLANK and not self.prefix:
             raise ValueError("Un-sane situation detected: prefix may not be blank")
         if self.prefix and self.prefix not in settings.PREFIXES:
-            raise ValueError(f"Un-sane situation detected: prefix {self.prefix!r} is not in PREFIXES")
+            raise ValueError(
+                f"Un-sane situation detected: prefix {self.prefix!r} is not in PREFIXES"
+            )
 
     def save(self, *args, **kwargs):
         if not self.code:

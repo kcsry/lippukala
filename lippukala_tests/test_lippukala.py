@@ -6,6 +6,7 @@ from django.conf import settings
 from lippukala.models import Code, Order
 from lippukala.reports import CodeReportWriter, get_code_report
 from lippukala.settings import PREFIXES
+
 from .utils import _create_test_order
 
 pytestmark = pytest.mark.django_db
@@ -49,7 +50,7 @@ def test_csv_reports_have_good_stuff():
     # We don't particularly care if we have extra orders/codes at this point, just as long
     # as the ones we just created are found
     for code in order.code_set.all():
-        assert (code.literate_code in csv_report_data), f"code {code!r} was missing"
+        assert code.literate_code in csv_report_data, f"code {code!r} was missing"
 
 
 def test_all_report_formats_seem_to_work():
@@ -63,6 +64,7 @@ def test_all_report_formats_seem_to_work():
 @pytest.mark.parametrize("one_per_page", (False, True))
 def test_printing(one_per_page):
     from lippukala.printing import OrderPrinter
+
     printer = OrderPrinter()
     printer.ONE_TICKET_PER_PAGE = one_per_page
     for x in range(3):

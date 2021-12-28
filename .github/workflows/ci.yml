@@ -1,0 +1,50 @@
+name: CI
+'on':
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  Test:
+    env:
+      DEBUG: '1'
+    runs-on: 'ubuntu-20.04'
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8', '3.9']
+    steps:
+      - name: 'Set up Python ${{ matrix.python-version }}'
+        uses: actions/setup-python@v2
+        with:
+          python-version: '${{ matrix.python-version }}'
+      - uses: actions/checkout@v2
+      - run: pip install tox-gh-actions tox
+      - run: tox
+      - uses: codecov/codecov-action@v2
+  Lint:
+    runs-on: 'ubuntu-20.04'
+    steps:
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+      - uses: actions/checkout@v2
+      - run: pip install -r requirements-dev.txt
+      - run: flake8 .
+      - run: isort --check .
+      - run: black --check .
+      - run: mypy lippukala
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+      - uses: actions/checkout@v2
+      - run: 'pip install build'
+      - run: python -m build .
+      - uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist/

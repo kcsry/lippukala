@@ -8,13 +8,18 @@ from lippukala.models import Code
 
 
 class CodeReportWriter:
-
     def __init__(self, code_queryset):
         self.code_queryset = code_queryset
 
     def get_fields_iterator(self):
-        return ((code.full_code, code.literate_code, f"Käytetty {code.used_on}" if code.used_on else "") for code in
-                self.code_queryset.iterator())
+        return (
+            (
+                code.full_code,
+                code.literate_code,
+                f"Käytetty {code.used_on}" if code.used_on else "",
+            )
+            for code in self.code_queryset.iterator()
+        )
 
     def get_report(self, format, as_response):
         format = str(format).lower()
@@ -26,6 +31,7 @@ class CodeReportWriter:
 
     def format_xls_report(self, filename, as_response):
         import xlwt
+
         workbook = xlwt.Workbook("UTF-8")
         sheet = workbook.add_sheet("Koodit")
         y = 0
@@ -44,10 +50,14 @@ class CodeReportWriter:
         else:
             return sio.getvalue()
 
-    def _format_delimited_report(self, filename, as_response, field_delimiter=";", record_delimiter="\r\n"):
+    def _format_delimited_report(
+        self, filename, as_response, field_delimiter=";", record_delimiter="\r\n"
+    ):
         content_type = f"text/csv; charset={settings.DEFAULT_CHARSET}"
 
-        iterator = (field_delimiter.join(fields) + record_delimiter for fields in self.get_fields_iterator())
+        iterator = (
+            field_delimiter.join(fields) + record_delimiter for fields in self.get_fields_iterator()
+        )
         if as_response:
             response = HttpResponse(iterator, content_type=content_type)
             response["Content-Disposition"] = f"attachment; filename={filename}"
@@ -63,6 +73,7 @@ class CodeReportWriter:
 
     def format_pdf_report(self, filename, as_response):
         from reportlab.pdfgen.canvas import Canvas
+
         sio = BytesIO()
         c = Canvas(sio)
         c.save()

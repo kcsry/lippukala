@@ -22,11 +22,19 @@ class OrderAdmin(ModelAdmin):
 
 def order_details(code):
     return f"{code.order.reference_number} ({code.order.address_text})"
-order_details.short_description = "Order"
+
+
+order_details.short_description = "Order"  # type: ignore[attr-defined]
 
 
 class CodeAdmin(ModelAdmin):
-    search_fields = ["code", "literate_code", "order__reference_number", "order__address_text", "order__comment"]
+    search_fields = [
+        "code",
+        "literate_code",
+        "order__reference_number",
+        "order__address_text",
+        "order__comment",
+    ]
     readonly_fields = ["order", "code", "literate_code", "prefix", "product_text"]
     list_filter = ["order__event", "status"]
     list_display = ["status", "code", "literate_code", order_details]
@@ -42,6 +50,7 @@ class CodeAdmin(ModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
 
 site.register(Order, OrderAdmin)
 site.register(Code, CodeAdmin)
