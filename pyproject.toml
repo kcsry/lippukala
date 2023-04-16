@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "Desuconin ja Traconin e-lippu-jarjestelmä"
 readme = "README.md"
 license = ""
-requires-python = ">=3.6"
+requires-python = ">=3.7"
 authors = [
     { name = "Aarni Koskela", email = "akx@iki.fi" },
 ]
