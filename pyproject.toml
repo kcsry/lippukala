@@ -36,16 +36,13 @@ migrations/.*
 '''
 
 [tool.pytest.ini_options]
-django_settings_module = "lippukala_test_app.settings"
+DJANGO_SETTINGS_MODULE = "lippukala_test_app.settings"
 norecursedirs = [".git", "venv*", "site-packages"]
 doctest_optionflags = ["NORMALIZE_WHITESPACE", "IGNORE_EXCEPTION_DETAIL", "ALLOW_UNICODE"]
 
 [tool.isort]
 profile = "black"
 multi_line_output = 3
-
-[tool.mypy]
-exclude = ".*migrations.*"
 
 [[tool.mypy.overrides]]
 module = "django.*"
@@ -58,3 +55,18 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = "xlwt.*"
 ignore_missing_imports = true
+
+[tool.ruff]
+exclude = ["migrations"]
+ignore = []
+line-length = 110
+select = [
+    "C9",
+    "E",
+    "F",
+    "I",
+    "W",
+]
+
+[tool.ruff.mccabe]
+max-complexity = 10
