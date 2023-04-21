@@ -1,9 +1,72 @@
 [build-system]
-requires = ["setuptools>=42"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lippukala"
+dynamic = ["version"]
+description = "Desuconin ja Traconin e-lippu-jarjestelmä"
+readme = "README.md"
+license = ""
+requires-python = ">=3.7"
+authors = [
+    { name = "Aarni Koskela", email = "akx@iki.fi" },
+]
+dependencies = [
+    "Django>=3.0",
+    "reportlab>=2.6",
+    "xlwt",
+]
+
+[project.urls]
+Homepage = "https://github.com/kcsry/paikkala"
+
+[tool.hatch.version]
+path = "lippukala/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/lippukala",
+]
 
 [tool.black]
 line-length = 100
 extend-exclude = '''
 migrations/.*
 '''
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "lippukala_test_app.settings"
+norecursedirs = [".git", "venv*", "site-packages"]
+doctest_optionflags = ["NORMALIZE_WHITESPACE", "IGNORE_EXCEPTION_DETAIL", "ALLOW_UNICODE"]
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[[tool.mypy.overrides]]
+module = "django.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "reportlab.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "xlwt.*"
+ignore_missing_imports = true
+
+[tool.ruff]
+exclude = ["migrations"]
+ignore = []
+line-length = 110
+select = [
+    "C9",
+    "E",
+    "F",
+    "I",
+    "W",
+]
+
+[tool.ruff.mccabe]
+max-complexity = 10
