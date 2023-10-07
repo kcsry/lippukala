@@ -1,7 +1,9 @@
 from django.db import models
 
+from lippukala.models.adapter_mixin import AdapterMixin
 
-class Order(models.Model):
+
+class Order(AdapterMixin, models.Model):
     """Encapsulates an order, which may contain zero or more codes.
 
     :var event: An (optional) event identifier for this order. May be used at the client app's discretion.
@@ -23,3 +25,9 @@ class Order(models.Model):
 
     def __str__(self):
         return "LK-%08d (ref %s)" % (self.pk, self.reference_number)
+
+    def __init__(self, *args, **kwargs) -> None:
+        adapter = kwargs.pop("adapter", None)
+        if adapter:
+            self._adapter = adapter
+        super().__init__(*args, **kwargs)
