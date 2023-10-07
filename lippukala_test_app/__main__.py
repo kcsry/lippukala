@@ -11,7 +11,7 @@ def seed():
     from lippukala_tests.utils import _create_test_order
 
     for x in range(20):
-        print(_create_test_order().pk)
+        print(_create_test_order(None).pk)
 
 
 def manage():
