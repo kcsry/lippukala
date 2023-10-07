@@ -4,7 +4,7 @@ from string import digits
 from django.db import models
 from django.utils.timezone import now
 
-import lippukala.settings as settings
+from lippukala.adapter import LippukalaAdapter
 from lippukala.consts import CODE_STATUS_CHOICES, UNUSED, USED
 from lippukala.excs import CantUseException
 
@@ -34,23 +34,33 @@ class Code(models.Model):
     def __str__(self):
         return f"Code {self.full_code} ({self.literate_code}) ({self.get_status_display()})"
 
+    def get_adapter(self) -> LippukalaAdapter:
+        return self.order.get_adapter()
+
     def _generate_code(self):
         qs = self.__class__.objects
+        adapter = self.get_adapter()
+        min_digits, max_digits = adapter.get_code_digit_range(self.prefix)
+        allow_leading_zeroes = adapter.get_code_allow_leading_zeroes(self.prefix)
+
         for attempt in range(500):  # 500 attempts really REALLY should be enough.
-            n_digits = randint(settings.CODE_MIN_N_DIGITS, settings.CODE_MAX_N_DIGITS + 1)
+            n_digits = randint(min_digits, max_digits + 1)
             code = "".join(choice(digits) for x in range(n_digits))
-            if not settings.CODE_ALLOW_LEADING_ZEROES:
+            if not allow_leading_zeroes:
                 code = code.lstrip("0")
             # Leading zeroes could have dropped digits off the code, so recheck that.
-            if settings.CODE_MIN_N_DIGITS <= len(code) <= settings.CODE_MAX_N_DIGITS:
+            if min_digits <= len(code) <= max_digits:
                 if not qs.filter(code=code).exists():
                     return code
 
         raise ValueError("Unable to find an unused code! Is the keyspace exhausted?")
 
     def _generate_literate_code(self):
-        default_literate_keyspace = settings.LITERATE_KEYSPACES.get(None)
-        keyspace = settings.LITERATE_KEYSPACES.get(self.prefix) or default_literate_keyspace
+        adapter = self.get_adapter()
+        keyspace = (
+            adapter.get_literate_keyspace(self.prefix) or
+            adapter.get_literate_keyspace(None)
+        )
 
         # When absolutely no keyspaces can be found, assume (prefix+code) will do
         if not keyspace:
@@ -69,7 +79,7 @@ class Code(models.Model):
 
         # Oh -- and if we had a prefix, add its literate counterpart now.
         if self.prefix:
-            bits.insert(0, settings.PREFIXES[self.prefix])
+            bits.insert(0, adapter.get_prefixes()[self.prefix])
 
         return " ".join(bits).strip()
 
@@ -87,12 +97,14 @@ class Code(models.Model):
                 "Un-sane situation detected: full_code contains non-digits. "
                 "(This might mean a contaminated prefix configuration.)"
             )
-        if not settings.PREFIX_MAY_BE_BLANK and not self.prefix:
-            raise ValueError("Un-sane situation detected: prefix may not be blank")
-        if self.prefix and self.prefix not in settings.PREFIXES:
-            raise ValueError(
-                f"Un-sane situation detected: prefix {self.prefix!r} is not in PREFIXES"
-            )
+        if not self.pk:  # If we've already saved the code, we will assume these are good
+            adapter = self.get_adapter()
+            if not adapter.get_prefix_may_be_blank() and not self.prefix:
+                raise ValueError("Un-sane situation detected: prefix may not be blank")
+            if self.prefix and self.prefix not in adapter.get_prefixes():
+                raise ValueError(
+                    f"Un-sane situation detected: prefix {self.prefix!r} is not in PREFIXES"
+                )
 
     def save(self, *args, **kwargs):
         if not self.code:
