@@ -10,12 +10,6 @@
       let useQueue = [];
       let currentlyShownId = null;
 
-      function forEachCode(func) {
-        for (const codeId in codes) {
-          func(codes[codeId]);
-        }
-      }
-
       function parseData(data) {
         if (typeof data === "string") data = JSON.parse(data);
         data.codes.forEach((code) => {
@@ -92,7 +86,7 @@
         const searchRegexp = new RegExp(regexpText, "i");
         let lastCode = null;
         document.body.className = "";
-        forEachCode((code) => {
+        for (const code of Object.values(codes)) {
           const prefixedCode = (code.prefix || "") + code.code;
           if (
             inputCode == code.code ||
@@ -105,7 +99,7 @@
             nStarting++;
             lastCode = code;
           }
-        });
+        }
         if (nStarting == 1) {
           showCode(lastCode);
           if (enter) confirmUseCode(lastCode);
