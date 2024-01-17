@@ -3,15 +3,40 @@
   <head>
     <title>POS</title>
     <script type="text/javascript">
+      /**
+       * @typedef {Object} Code
+       * @property {number} id
+       * @property {boolean} used
+       * @property {string} code
+       * @property {string} prefix
+       * @property {string} lit
+       * @property {string} [name]
+       * @property {string} comment
+       * @property {string} prod
+       * @property {boolean} [localUsed]
+       */
+
+      /**
+       * @typedef {Object} CodesResponse
+       * @property {Code[]} codes
+       */
+
       let codeInput;
       let statusDiv;
 
+      /** @type {Record<number, Code>} */
       const codes = {};
+
+      /** @type {number[]} */
       let useQueue = [];
+
+      /** @type {number|null} */
       let currentlyShownId = null;
 
+      /**
+       * @param {CodesResponse} data
+       */
       function parseData(data) {
-        if (typeof data === "string") data = JSON.parse(data);
         for (const code of data.codes) {
           codes[code.id] = { ...(codes[code.id] || {}), ...code };
         }
@@ -38,6 +63,9 @@
         );
       }
 
+      /**
+       * @param {Code} code
+       */
       function showCode(code) {
         currentlyShownId = code.id;
         statusDiv.innerHTML = Tee(
@@ -50,12 +78,18 @@
         document.body.className = cls;
       }
 
+      /**
+       * @param {Code} code
+       */
       function useCode(code) {
         code.localUsed = true;
         useQueue.push(code.id);
         showCode(code);
       }
 
+      /**
+       * @param {Code} code
+       */
       function confirmUseCode(code) {
         if (code.used || code.localUsed) {
           alert(
