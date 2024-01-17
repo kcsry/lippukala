@@ -6,21 +6,6 @@
       let codeInput;
       let statusDiv;
 
-      function xhr(url, data, callback) {
-        const req = new XMLHttpRequest();
-        req.open(data ? "POST" : "GET", url);
-        req.setRequestHeader(
-          "Content-Type",
-          "application/x-www-form-urlencoded",
-        );
-        req.onreadystatechange = function () {
-          if (req.readyState === 4 && req.status === 200) {
-            callback(req.status == 200, req.responseText, req);
-          }
-        };
-        req.send(data);
-      }
-
       const codes = {};
       let useQueue = [];
       let currentlyShownId = null;
@@ -39,10 +24,12 @@
         console.log(`Got ${data.codes.length} codes`);
       }
 
-      function download() {
-        xhr(`?json=1&t=${0 | new Date()}`, null, (error, data, req) => {
-          parseData(data);
-        });
+      async function download() {
+        const jsonUrl = `?json=1&t=${0 | new Date()}`;
+        const response = await fetch(jsonUrl);
+        if (!response.ok) throw new Error(`Failed to fetch ${jsonUrl}`);
+        const data = await response.json();
+        parseData(data);
       }
 
       function escapeHtml(str) {
@@ -139,21 +126,24 @@
         search(true);
       }
 
-      function syncUseQueue() {
+      async function syncUseQueue() {
         useQueue = useQueue.filter(
           (id) => codes[id].localUsed && !codes[id].used,
         );
-        if (useQueue.length) {
-          xhr(
-            location.href,
-            `use=${useQueue.join(",")}`,
-            (error, data, xhr) => {
-              console.log(`successfully synced ${useQueue.length} code uses`);
-              parseData(data);
-              if (currentlyShownId) showCode(codes[currentlyShownId]);
-            },
-          );
+        if (!useQueue.length) {
+          return;
         }
+        const formData = new FormData();
+        formData.append("use", useQueue.join(","));
+        const resp = await fetch(location.href, {
+          method: "POST",
+          body: formData,
+        });
+        if (!resp.ok) throw new Error(`Failed to sync use queue`);
+        const data = await resp.json();
+        console.log(`successfully synced ${useQueue.length} code uses`);
+        parseData(data);
+        if (currentlyShownId) showCode(codes[currentlyShownId]);
       }
 
       function debounce(fn, delay) {
@@ -231,6 +221,7 @@
         margin: auto;
         text-align: center;
       }
+
       #code {
         width: 100%;
       }
