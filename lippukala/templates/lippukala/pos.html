@@ -100,7 +100,7 @@ function search(enter) {
     var nStarting = 0;
     var inputCode = codeInput.value.toLowerCase();
 	var regexpText = "^" + inputCode;
-	if(/^[a-z]+ /i.test(inputCode)) { // Cheap "fuzzy" searching ("d bu" will match "desu butler")
+	if(/^[-a-z]+ /i.test(inputCode)) { // Cheap "fuzzy" searching ("d bu" will match "desu butler")
 		regexpText = "^" + inputCode.split(/\s+/).filter(function(word){return word.length>0;}).join("[^ ]*? ");
 		regexpText = regexpText.replace(/\s+$/, '');
 	}
