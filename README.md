@@ -1,31 +1,25 @@
-lippukala
-=========
+# lippukala
 
 App for managing e-tickets for conventions.
 
-Getting started
----------------
+## Getting started
 
     python3 -m venv venv-lippukala
     source venv-lippukala/bin/activate
 
     git clone git@github.com:kcsry/lippukala
     cd lippukala
-    pip install -e .[dev] -r requirements-dev.txt
+    pip install -e .[dev]
 
+## POS test mode
 
-POS test mode
--------------
-
-	python lippukala_test_app.py seed
-	python lippukala_test_app.py runserver
-	start http://localhost:8000/pos
+    python lippukala_test_app.py seed
+    python lippukala_test_app.py runserver
+    start http://localhost:8000/pos
 
 (Look at the `codes` JavaScript variable for example codes to use.)
 
-
-Copyright & license
--------------------
+## Copyright & license
 
     The MIT License (MIT)
 
