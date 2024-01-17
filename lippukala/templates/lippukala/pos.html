@@ -3,11 +3,11 @@
   <head>
     <title>POS</title>
     <script type="text/javascript">
-      var codeInput;
-      var statusDiv;
+      let codeInput;
+      let statusDiv;
 
       function xhr(url, data, callback) {
-        var req = new XMLHttpRequest();
+        const req = new XMLHttpRequest();
         req.open(data ? "POST" : "GET", url);
         req.setRequestHeader(
           "Content-Type",
@@ -21,40 +21,40 @@
         req.send(data);
       }
 
-      var codes = {};
-      var useQueue = [];
-      var currentlyShownId = null;
+      const codes = {};
+      let useQueue = [];
+      let currentlyShownId = null;
 
       function forEachCode(func) {
-        for (var codeId in codes) {
+        for (const codeId in codes) {
           func(codes[codeId]);
         }
       }
 
       function parseData(data) {
         if (typeof data === "string") data = JSON.parse(data);
-        data.codes.forEach(function (code) {
-          codes[code.id] = {...codes[code.id] || {}, ...code};
+        data.codes.forEach((code) => {
+          codes[code.id] = { ...(codes[code.id] || {}), ...code };
         });
-        console.log("Got " + data.codes.length + " codes");
+        console.log(`Got ${data.codes.length} codes`);
       }
 
       function download() {
-        xhr("?json=1&t=" + (0 | new Date()), null, function (error, data, req) {
+        xhr(`?json=1&t=${0 | new Date()}`, null, (error, data, req) => {
           parseData(data);
         });
       }
 
       function escapeHtml(str) {
-        var div = document.createElement("div");
+        const div = document.createElement("div");
         div.appendChild(document.createTextNode(str));
         return div.innerHTML;
       }
 
       function Tee(template, env) {
-        return template.replace(/\{(.+?)\}/g, function (_, m) {
-          return escapeHtml(env[m] || "").replace(/\n/g, "<br>");
-        });
+        return template.replace(/\{(.+?)\}/g, (_, m) =>
+          escapeHtml(env[m] || "").replace(/\n/g, "<br>"),
+        );
       }
 
       function showCode(code) {
@@ -63,7 +63,7 @@
           "<div class=cd><span class=pfx>{prefix}</span>{code}</div>{lit}<div class=product>{prod}</div><div class=addr>{name}</div><div class=comment>{comment}</div>",
           code,
         );
-        var cls = "code-unused";
+        let cls = "code-unused";
         if (code.used) cls = "code-used";
         else if (code.localUsed) cls = "code-localused";
         document.body.className = cls;
@@ -80,40 +80,33 @@
           alert(
             "Koodi näyttää jo käytetyltä!\nOta yhteys tapahtuman taloustiimiin asian selvittämiseksi.",
           );
-          return;
-        } else {
-          if (confirm("Käytä koodi " + code.code + "?")) {
-            useCode(code);
-            setTimeout(syncUseQueue, 4);
-            setTimeout(function () {
-              codeInput.value = "";
-              codeInput.focus();
-            }, 250);
-          }
+        } else if (confirm(`Käytä koodi ${code.code}?`)) {
+          useCode(code);
+          setTimeout(syncUseQueue, 4);
+          setTimeout(() => {
+            codeInput.value = "";
+            codeInput.focus();
+          }, 250);
         }
       }
 
       function search(enter) {
-        var nStarting = 0;
-        var inputCode = codeInput.value.toLowerCase();
-        var regexpText = "^" + inputCode;
+        let nStarting = 0;
+        const inputCode = codeInput.value.toLowerCase();
+        let regexpText = `^${inputCode}`;
         if (/^[-a-z]+ /i.test(inputCode)) {
           // Cheap "fuzzy" searching ("d bu" will match "desu butler")
-          regexpText =
-            "^" +
-            inputCode
-              .split(/\s+/)
-              .filter(function (word) {
-                return word.length > 0;
-              })
-              .join("[^ ]*? ");
+          regexpText = `^${inputCode
+            .split(/\s+/)
+            .filter((word) => word.length > 0)
+            .join("[^ ]*? ")}`;
           regexpText = regexpText.replace(/\s+$/, "");
         }
-        var searchRegexp = new RegExp(regexpText, "i");
-        var lastCode = null;
+        const searchRegexp = new RegExp(regexpText, "i");
+        let lastCode = null;
         document.body.className = "";
-        forEachCode(function (code) {
-          var prefixedCode = (code.prefix || "") + code.code;
+        forEachCode((code) => {
+          const prefixedCode = (code.prefix || "") + code.code;
           if (
             inputCode == code.code ||
             inputCode == prefixedCode ||
@@ -133,7 +126,7 @@
           statusDiv.innerHTML =
             "Koodilla ei löydy yhtään lippua. Ole hyvä ja tarkista oikeinkirjoitus ja tapahtuma!";
         } else {
-          statusDiv.innerHTML = "... " + nStarting + " ...";
+          statusDiv.innerHTML = `... ${nStarting} ...`;
         }
       }
 
@@ -147,17 +140,15 @@
       }
 
       function syncUseQueue() {
-        useQueue = useQueue.filter(function (id) {
-          return codes[id].localUsed && !codes[id].used;
-        });
+        useQueue = useQueue.filter(
+          (id) => codes[id].localUsed && !codes[id].used,
+        );
         if (useQueue.length) {
           xhr(
             location.href,
-            "use=" + useQueue.join(","),
-            function (error, data, xhr) {
-              console.log(
-                "successfully synced " + useQueue.length + " code uses",
-              );
+            `use=${useQueue.join(",")}`,
+            (error, data, xhr) => {
+              console.log(`successfully synced ${useQueue.length} code uses`);
               parseData(data);
               if (currentlyShownId) showCode(codes[currentlyShownId]);
             },
@@ -166,9 +157,9 @@
       }
 
       function debounce(fn, delay) {
-        var timer = null;
+        let timer = null;
         return function () {
-          var clear = function () {
+          const clear = function () {
             timer = null;
           };
           if (timer === null) {
