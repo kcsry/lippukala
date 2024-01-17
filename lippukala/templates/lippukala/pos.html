@@ -31,23 +31,10 @@
         }
       }
 
-      function extend(/* ... */) {
-        var target = arguments[0];
-        for (var i = 1; i < arguments.length; i++) {
-          var source = arguments[i];
-          if (source) {
-            for (var key in source) {
-              target[key] = source[key];
-            }
-          }
-        }
-        return target;
-      }
-
       function parseData(data) {
         if (typeof data === "string") data = JSON.parse(data);
         data.codes.forEach(function (code) {
-          codes[code.id] = extend(codes[code.id] || {}, code);
+          codes[code.id] = {...codes[code.id] || {}, ...code};
         });
         console.log("Got " + data.codes.length + " codes");
       }
