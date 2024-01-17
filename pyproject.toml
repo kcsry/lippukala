@@ -18,6 +18,13 @@ dependencies = [
     "xlwt",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "pytest-django",
+]
+
 [project.urls]
 Homepage = "https://github.com/kcsry/paikkala"
 

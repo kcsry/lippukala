@@ -21,7 +21,6 @@ jobs:
           cache: pip
           cache-dependency-path: |
             pyproject.toml
-            requirements*txt
       - run: pip install tox-gh-actions tox
       - run: tox
       - uses: codecov/codecov-action@v3
@@ -35,7 +34,6 @@ jobs:
           cache: pip
           cache-dependency-path: |
             pyproject.toml
-            requirements*txt
       - uses: pre-commit/action@v3.0.0
   Build:
     runs-on: ubuntu-latest

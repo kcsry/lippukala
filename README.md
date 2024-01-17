@@ -9,7 +9,7 @@ App for managing e-tickets for conventions.
 
     git clone git@github.com:kcsry/lippukala
     cd lippukala
-    pip install -e .[dev] -r requirements-dev.txt
+    pip install -e .[dev]
 
 ## POS test mode
 
