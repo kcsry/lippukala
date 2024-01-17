@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="fi">
   <head>
     <title>POS</title>
     <script type="text/javascript">
@@ -12,14 +12,14 @@
 
       function parseData(data) {
         if (typeof data === "string") data = JSON.parse(data);
-        data.codes.forEach((code) => {
+        for (const code of data.codes) {
           codes[code.id] = { ...(codes[code.id] || {}), ...code };
-        });
+        }
         console.log(`Got ${data.codes.length} codes`);
       }
 
       async function download() {
-        const jsonUrl = `?json=1&t=${0 | new Date()}`;
+        const jsonUrl = `?json=1&t=${Math.round(+new Date())}`;
         const response = await fetch(jsonUrl);
         if (!response.ok) throw new Error(`Failed to fetch ${jsonUrl}`);
         const data = await response.json();
@@ -61,14 +61,17 @@
           alert(
             "Koodi näyttää jo käytetyltä!\nOta yhteys tapahtuman taloustiimiin asian selvittämiseksi.",
           );
-        } else if (confirm(`Käytä koodi ${code.code}?`)) {
-          useCode(code);
-          setTimeout(syncUseQueue, 4);
-          setTimeout(() => {
-            codeInput.value = "";
-            codeInput.focus();
-          }, 250);
+          return;
+        } // eslint-disable-next-line no-restricted-globals
+        if (!confirm(`Käytä koodi ${code.code}?`)) {
+          return;
         }
+        useCode(code);
+        setTimeout(syncUseQueue, 4);
+        setTimeout(() => {
+          codeInput.value = "";
+          codeInput.focus();
+        }, 250);
       }
 
       function search(enter) {
@@ -89,9 +92,9 @@
         for (const code of Object.values(codes)) {
           const prefixedCode = (code.prefix || "") + code.code;
           if (
-            inputCode == code.code ||
-            inputCode == prefixedCode ||
-            inputCode == code.lit.toLowerCase() ||
+            inputCode === code.code ||
+            inputCode === prefixedCode ||
+            inputCode === code.lit.toLowerCase() ||
             searchRegexp.test(code.code) ||
             searchRegexp.test(prefixedCode) ||
             searchRegexp.test(code.lit)
@@ -100,10 +103,10 @@
             lastCode = code;
           }
         }
-        if (nStarting == 1) {
+        if (nStarting === 1) {
           showCode(lastCode);
           if (enter) confirmUseCode(lastCode);
-        } else if (nStarting == 0) {
+        } else if (nStarting === 0) {
           statusDiv.innerHTML =
             "Koodilla ei löydy yhtään lippua. Ole hyvä ja tarkista oikeinkirjoitus ja tapahtuma!";
         } else {
@@ -111,7 +114,7 @@
         }
       }
 
-      function keyPress(event) {
+      function keyPress() {
         search(false);
       }
 
@@ -129,6 +132,7 @@
         }
         const formData = new FormData();
         formData.append("use", useQueue.join(","));
+        // eslint-disable-next-line no-restricted-globals
         const resp = await fetch(location.href, {
           method: "POST",
           body: formData,
@@ -147,17 +151,17 @@
             timer = null;
           };
           if (timer === null) {
-            fn.apply(this, arguments);
+            fn.apply(this, arguments); // eslint-disable-line prefer-rest-params
           } else {
-            arguments[0].preventDefault();
+            arguments[0].preventDefault(); // eslint-disable-line prefer-rest-params
           }
           window.clearTimeout(timer);
           timer = window.setTimeout(clear, delay);
         };
       }
 
-      function init() {
-        download();
+      window.init = async function init() {
+        await download();
         setInterval(download, (50 + Math.random() * 20) * 1000);
         setInterval(syncUseQueue, 5000);
 
@@ -167,9 +171,9 @@
         document
           .getElementById("codeform")
           .addEventListener("submit", debounce(formSubmit, 250), true);
-      }
+      };
     </script>
-    <style type="text/css">
+    <style>
       body,
       input {
         font:
