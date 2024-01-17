@@ -7,13 +7,13 @@ name = "lippukala"
 dynamic = ["version"]
 description = "Desuconin ja Traconin e-lippu-jarjestelmä"
 readme = "README.md"
-license = ""
-requires-python = ">=3.7"
+license = "MIT"
+requires-python = ">=3.8"
 authors = [
     { name = "Aarni Koskela", email = "akx@iki.fi" },
 ]
 dependencies = [
-    "Django>=3.0",
+    "Django>=4.2",
     "reportlab>=2.6",
     "xlwt",
 ]
