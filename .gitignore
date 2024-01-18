@@ -39,3 +39,6 @@ nosetests.xml
 
 .cache
 htmlcov
+
+node_modules
+package-lock.json
