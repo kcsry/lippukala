@@ -21,9 +21,6 @@
        * @property {Code[]} codes
        */
 
-      let codeInput;
-      let statusDiv;
-
       /** @type {Record<number, Code>} */
       const codes = {};
 
@@ -32,6 +29,16 @@
 
       /** @type {number|null} */
       let currentlyShownId = null;
+
+      /**
+       * @param {string} id ID or selector
+       * @returns {HTMLElement}
+       */
+      function $(id) {
+        const el = document.getElementById(id) ?? document.querySelector(id);
+        if (!el) throw new Error(`Element ${id} not found`);
+        return el;
+      }
 
       /**
        * @param {CodesResponse} data
@@ -66,7 +73,7 @@
        */
       function showCode(code) {
         currentlyShownId = code.id;
-        statusDiv.innerHTML = Tee(
+        $("#status").innerHTML = Tee(
           "<div class=cd><span class=pfx>{prefix}</span>{code}</div>{lit}<div class=product>{prod}</div><div class=addr>{name}</div><div class=comment>{comment}</div>",
           code,
         );
@@ -99,6 +106,7 @@
         useCode(code);
         setTimeout(syncUseQueue, 4);
         setTimeout(() => {
+          const codeInput = $("#code");
           codeInput.value = "";
           codeInput.focus();
         }, 250);
@@ -106,7 +114,7 @@
 
       function search(enter) {
         let nStarting = 0;
-        const inputCode = codeInput.value.toLowerCase();
+        const inputCode = $("#code").value.toLowerCase();
         let regexpText = `^${inputCode}`;
         if (/^[-a-z]+ /i.test(inputCode)) {
           // Cheap "fuzzy" searching ("d bu" will match "desu butler")
@@ -133,6 +141,7 @@
             lastCode = code;
           }
         }
+        const statusDiv = $("#status");
         if (nStarting === 1) {
           showCode(lastCode);
           if (enter) confirmUseCode(lastCode);
@@ -192,9 +201,7 @@
         setInterval(download, (50 + Math.random() * 20) * 1000);
         setInterval(syncUseQueue, 5000);
 
-        codeInput = document.getElementById("code");
-        statusDiv = document.getElementById("status");
-        codeInput.addEventListener("input", keyPress, true);
+        $("#code").addEventListener("input", keyPress, true);
         document.getElementById("codeform").addEventListener("submit", debounce(formSubmit, 250), true);
       };
     </script>
