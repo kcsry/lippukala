@@ -69,18 +69,25 @@
       }
 
       /**
-       * @param {Code} code
+       * @param {Code|null} code
        */
       function showCode(code) {
-        currentlyShownId = code.id;
-        $("#status").innerHTML = Tee(
-          "<div class=cd><span class=pfx>{prefix}</span>{code}</div>{lit}<div class=product>{prod}</div><div class=addr>{name}</div><div class=comment>{comment}</div>",
-          code,
-        );
-        let cls = "code-unused";
-        if (code.used) cls = "code-used";
-        else if (code.localUsed) cls = "code-localused";
-        document.body.className = cls;
+        const statusDiv = $("#status");
+        if (code) {
+          currentlyShownId = code.id;
+          statusDiv.innerHTML = Tee(
+            "<div class=cd><span class=pfx>{prefix}</span>{code}</div>{lit}<div class=product>{prod}</div><div class=addr>{name}</div><div class=comment>{comment}</div>",
+            code,
+          );
+          let cls = "code-unused";
+          if (code.used) cls = "code-used";
+          else if (code.localUsed) cls = "code-localused";
+          document.body.className = cls;
+        } else {
+          currentlyShownId = null;
+          statusDiv.innerHTML = "";
+          document.body.className = "";
+        }
       }
 
       /**
@@ -112,9 +119,14 @@
         }, 250);
       }
 
-      function search(enter) {
-        let nStarting = 0;
-        const inputCode = $("#code").value.toLowerCase();
+      /**
+       * Find matching codes for the given input code.
+       *
+       * @param {string} inputCode
+       * @returns {nMatches: number, code: Code | null}
+       */
+      function findMatchingCodes(inputCode) {
+        let nMatches = 0;
         let regexpText = `^${inputCode}`;
         if (/^[-a-z]+ /i.test(inputCode)) {
           // Cheap "fuzzy" searching ("d bu" will match "desu butler")
@@ -126,7 +138,6 @@
         }
         const searchRegexp = new RegExp(regexpText, "i");
         let lastCode = null;
-        document.body.className = "";
         for (const code of Object.values(codes)) {
           const prefixedCode = (code.prefix || "") + code.code;
           if (
@@ -137,23 +148,32 @@
             searchRegexp.test(prefixedCode) ||
             searchRegexp.test(code.lit)
           ) {
-            nStarting++;
+            nMatches++;
             lastCode = code;
           }
         }
-        const statusDiv = $("#status");
-        if (nStarting === 1) {
-          showCode(lastCode);
-          if (enter) confirmUseCode(lastCode);
-        } else if (nStarting === 0) {
-          statusDiv.innerHTML = "Koodilla ei löydy yhtään lippua. Ole hyvä ja tarkista oikeinkirjoitus ja tapahtuma!";
-        } else {
-          statusDiv.innerHTML = `... ${nStarting} ...`;
-        }
+        return { nMatches, code: nMatches === 1 ? lastCode : null };
       }
 
-      function keyPress() {
-        search(false);
+      function search(enter) {
+        const statusDiv = $("#status");
+        const inputCode = $("#code").value.toLowerCase().trim();
+        if (!inputCode.length) {
+          showCode(null);
+          statusDiv.innerHTML = "";
+          return;
+        }
+        const { nMatches, code } = findMatchingCodes(inputCode);
+        if (nMatches === 1) {
+          showCode(code);
+          if (enter) confirmUseCode(code);
+        } else if (nMatches === 0) {
+          showCode(null);
+          statusDiv.innerHTML = "Koodilla ei löydy yhtään lippua. Ole hyvä ja tarkista oikeinkirjoitus ja tapahtuma!";
+        } else {
+          showCode(null);
+          statusDiv.innerHTML = `... ${nMatches} ...`;
+        }
       }
 
       function formSubmit(event) {
@@ -200,9 +220,8 @@
         await download();
         setInterval(download, (50 + Math.random() * 20) * 1000);
         setInterval(syncUseQueue, 5000);
-
-        $("#code").addEventListener("input", keyPress, true);
-        document.getElementById("codeform").addEventListener("submit", debounce(formSubmit, 250), true);
+        $("#code").addEventListener("input", () => search(false), true);
+        $("#codeform").addEventListener("submit", debounce(formSubmit, 250), true);
       };
     </script>
     <style>
