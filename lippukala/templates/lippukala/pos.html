@@ -21,8 +21,8 @@
        * @property {Code[]} codes
        */
 
-      let codeInput;
-      let statusDiv;
+      /** @type {Code|null} */
+      let codeToConfirm = null;
 
       /** @type {Record<number, Code>} */
       const codes = {};
@@ -32,6 +32,16 @@
 
       /** @type {number|null} */
       let currentlyShownId = null;
+
+      /**
+       * @param {string} id ID or selector
+       * @returns {HTMLElement}
+       */
+      function $(id) {
+        const el = document.getElementById(id) ?? document.querySelector(id);
+        if (!el) throw new Error(`Element ${id} not found`);
+        return el;
+      }
 
       /**
        * @param {CodesResponse} data
@@ -57,25 +67,38 @@
         return div.innerHTML;
       }
 
+      function shortenName(name) {
+        if (name) {
+          const [word1, word2] = name.trim().split(/\s+/);
+          return `${word1} ${word2[0]}.`;
+        }
+        return "";
+      }
+
       function Tee(template, env) {
-        return template.replace(/\{(.+?)\}/g, (_, m) =>
-          escapeHtml(env[m] || "").replace(/\n/g, "<br>"),
-        );
+        return template.replace(/\{(.+?)\}/g, (_, m) => escapeHtml(env[m] || "").replace(/\n/g, "<br>"));
       }
 
       /**
-       * @param {Code} code
+       * @param {Code|null} code
        */
       function showCode(code) {
-        currentlyShownId = code.id;
-        statusDiv.innerHTML = Tee(
-          "<div class=cd><span class=pfx>{prefix}</span>{code}</div>{lit}<div class=product>{prod}</div><div class=addr>{name}</div><div class=comment>{comment}</div>",
-          code,
-        );
-        let cls = "code-unused";
-        if (code.used) cls = "code-used";
-        else if (code.localUsed) cls = "code-localused";
-        document.body.className = cls;
+        const statusDiv = $("#status");
+        if (code) {
+          currentlyShownId = code.id;
+          statusDiv.innerHTML = Tee(
+            "<div class=cd><span class=pfx>{prefix}</span>{code}</div>{lit}<div class=product>{prod}</div><div class=addr>{short_name}<div class=fulladdr>{name}</div></div><div class=comment>{comment}</div>",
+            { ...code, short_name: shortenName(code.name) },
+          );
+          let cls = "code-unused";
+          if (code.used) cls = "code-used";
+          else if (code.localUsed) cls = "code-localused";
+          document.body.className = cls;
+        } else {
+          currentlyShownId = null;
+          statusDiv.innerHTML = "";
+          document.body.className = "";
+        }
       }
 
       /**
@@ -92,25 +115,41 @@
        */
       function confirmUseCode(code) {
         if (code.used || code.localUsed) {
-          alert(
-            "Koodi näyttää jo käytetyltä!\nOta yhteys tapahtuman taloustiimiin asian selvittämiseksi.",
-          );
-          return;
-        } // eslint-disable-next-line no-restricted-globals
-        if (!confirm(`Käytä koodi ${code.code}?`)) {
+          alert("Koodi näyttää jo käytetyltä!\nOta yhteys tapahtuman taloustiimiin asian selvittämiseksi.");
           return;
         }
+        codeToConfirm = code;
+        $("#confirm-dialog").showModal();
+        $("#confirm-button").focus();
+      }
+
+      /**
+       * Form submit handler for the confirm form dialog.
+       */
+      function onConfirmCode() {
+        const code = codeToConfirm;
+        if (!code) {
+          alert("Koodi puuttuu, kummaa!");
+          return;
+        }
+        codeToConfirm = null;
         useCode(code);
         setTimeout(syncUseQueue, 4);
         setTimeout(() => {
+          const codeInput = $("#code");
           codeInput.value = "";
           codeInput.focus();
         }, 250);
       }
 
-      function search(enter) {
-        let nStarting = 0;
-        const inputCode = codeInput.value.toLowerCase();
+      /**
+       * Find matching codes for the given input code.
+       *
+       * @param {string} inputCode
+       * @returns {nMatches: number, code: Code | null}
+       */
+      function findMatchingCodes(inputCode) {
+        let nMatches = 0;
         let regexpText = `^${inputCode}`;
         if (/^[-a-z]+ /i.test(inputCode)) {
           // Cheap "fuzzy" searching ("d bu" will match "desu butler")
@@ -122,7 +161,6 @@
         }
         const searchRegexp = new RegExp(regexpText, "i");
         let lastCode = null;
-        document.body.className = "";
         for (const code of Object.values(codes)) {
           const prefixedCode = (code.prefix || "") + code.code;
           if (
@@ -133,23 +171,32 @@
             searchRegexp.test(prefixedCode) ||
             searchRegexp.test(code.lit)
           ) {
-            nStarting++;
+            nMatches++;
             lastCode = code;
           }
         }
-        if (nStarting === 1) {
-          showCode(lastCode);
-          if (enter) confirmUseCode(lastCode);
-        } else if (nStarting === 0) {
-          statusDiv.innerHTML =
-            "Koodilla ei löydy yhtään lippua. Ole hyvä ja tarkista oikeinkirjoitus ja tapahtuma!";
-        } else {
-          statusDiv.innerHTML = `... ${nStarting} ...`;
-        }
+        return { nMatches, code: nMatches === 1 ? lastCode : null };
       }
 
-      function keyPress() {
-        search(false);
+      function search(enter) {
+        const statusDiv = $("#status");
+        const inputCode = $("#code").value.toLowerCase().trim();
+        if (!inputCode.length) {
+          showCode(null);
+          statusDiv.innerHTML = "";
+          return;
+        }
+        const { nMatches, code } = findMatchingCodes(inputCode);
+        if (nMatches === 1) {
+          showCode(code);
+          if (enter) confirmUseCode(code);
+        } else if (nMatches === 0) {
+          showCode(null);
+          statusDiv.innerHTML = "Koodilla ei löydy yhtään lippua. Ole hyvä ja tarkista oikeinkirjoitus ja tapahtuma!";
+        } else {
+          showCode(null);
+          statusDiv.innerHTML = `... ${nMatches} ...`;
+        }
       }
 
       function formSubmit(event) {
@@ -157,10 +204,14 @@
         search(true);
       }
 
+      function cancelConfirm() {
+        const confirmDialog = $("#confirm-dialog");
+        if (confirmDialog.open) confirmDialog.close();
+        $("#code").focus();
+      }
+
       async function syncUseQueue() {
-        useQueue = useQueue.filter(
-          (id) => codes[id].localUsed && !codes[id].used,
-        );
+        useQueue = useQueue.filter((id) => codes[id].localUsed && !codes[id].used);
         if (!useQueue.length) {
           return;
         }
@@ -198,22 +249,32 @@
         await download();
         setInterval(download, (50 + Math.random() * 20) * 1000);
         setInterval(syncUseQueue, 5000);
-
-        codeInput = document.getElementById("code");
-        statusDiv = document.getElementById("status");
-        codeInput.addEventListener("input", keyPress, true);
-        document
-          .getElementById("codeform")
-          .addEventListener("submit", debounce(formSubmit, 250), true);
+        $("#code").addEventListener("input", () => search(false), true);
+        $("#codeform").addEventListener("submit", debounce(formSubmit, 250), true);
+        $("#confirm-form").addEventListener("submit", onConfirmCode, true);
+        $("#confirm-dialog").addEventListener("close", cancelConfirm, true);
       };
     </script>
     <style>
-      body,
-      input {
+      html {
         font:
-          36pt/1.2 Arial,
+          36pt/1.2 system-ui,
           sans-serif;
-        -webkit-transition: background 0.5s;
+      }
+
+      body {
+        overflow: hidden;
+        transition: background 0.5s;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body,
+      input,
+      button {
+        font: inherit;
       }
 
       body.code-unused {
@@ -235,6 +296,7 @@
         color: #fff;
         font-size: 48pt;
         padding: 12pt;
+        margin-bottom: 0.5rem;
       }
 
       .pfx {
@@ -242,33 +304,85 @@
       }
 
       .product {
-        margin: 0.5em;
-        padding: 0.5em;
-        background: #333;
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        background: rgb(0, 0, 0, 0.4);
         color: #fff;
-        border: 0.2em solid #000;
       }
 
-      form {
+      .fulladdr {
+        font-size: 75%;
+        margin-top: 0.5em;
+        color: transparent;
+        border: 1px dashed rgb(255, 255, 255, 0.5);
+      }
+
+      .fulladdr:hover {
+        color: inherit;
+        border-color: transparent;
+      }
+
+      #codeform {
         margin: auto;
         text-align: center;
       }
 
       #code {
         width: 100%;
+        margin-bottom: 0.5rem;
+        padding: 0.25rem;
+      }
+
+      ::backdrop {
+        background-image: linear-gradient(to bottom, rgb(0, 0, 0, 0.8), rgb(0, 0, 0, 0.4), rgb(0, 0, 0, 0.8));
+      }
+
+      #confirm-dialog {
+        min-width: 15em;
+        backdrop-filter: blur(5px);
+        background: rgba(255, 255, 255, 0.85);
+        text-align: center;
+        font-size: 0.75em;
+        padding: 0.5rem;
+      }
+
+      #confirm-dialog form {
+        display: inline;
+      }
+
+      #confirm-dialog button {
+        margin: 0.5em;
+        margin-bottom: 0;
+        padding: 0.25em 0.75em;
+        border-width: 0;
+        border-bottom-width: 0.1em;
+      }
+
+      #confirm-button {
+        background: lightgreen;
+        border-bottom-color: forestgreen;
+        font-weight: bold;
+      }
+
+      #cancel-button {
+        background: orangered;
+        border-bottom-color: firebrick;
       }
     </style>
   </head>
   <body onload="init()">
     <form id="codeform">
-      <input
-        placeholder="koodi tähän"
-        type="text"
-        id="code"
-        autofocus
-        autocomplete="no"
-      /><br />
+      <input placeholder="koodi tähän" type="text" id="code" autofocus autocomplete="no" /><br />
       <div id="status">&nbsp;</div>
     </form>
+    <dialog id="confirm-dialog">
+      Käytä koodi?
+      <div>
+        <form method="dialog" id="confirm-form">
+          <button id="confirm-button">Käytä</button>
+        </form>
+        <button id="cancel-button" onclick="cancelConfirm()">Peruuta</button>
+      </div>
+    </dialog>
   </body>
 </html>

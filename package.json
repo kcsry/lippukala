@@ -1,6 +1,7 @@
 {
   "prettier": {
-    "trailingComma": "all"
+    "trailingComma": "all",
+    "printWidth": 120
   },
   "devDependencies": {
     "eslint": "^8.56.0",
