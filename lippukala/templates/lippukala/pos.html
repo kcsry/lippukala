@@ -67,6 +67,14 @@
         return div.innerHTML;
       }
 
+      function shortenName(name) {
+        if (name) {
+          const [word1, word2] = name.trim().split(/\s+/);
+          return `${word1} ${word2[0]}.`;
+        }
+        return "";
+      }
+
       function Tee(template, env) {
         return template.replace(/\{(.+?)\}/g, (_, m) => escapeHtml(env[m] || "").replace(/\n/g, "<br>"));
       }
@@ -79,8 +87,8 @@
         if (code) {
           currentlyShownId = code.id;
           statusDiv.innerHTML = Tee(
-            "<div class=cd><span class=pfx>{prefix}</span>{code}</div>{lit}<div class=product>{prod}</div><div class=addr>{name}</div><div class=comment>{comment}</div>",
-            code,
+            "<div class=cd><span class=pfx>{prefix}</span>{code}</div>{lit}<div class=product>{prod}</div><div class=addr>{short_name}<div class=fulladdr>{name}</div></div><div class=comment>{comment}</div>",
+            { ...code, short_name: shortenName(code.name) },
           );
           let cls = "code-unused";
           if (code.used) cls = "code-used";
@@ -300,6 +308,18 @@
         padding: 0.5rem;
         background: rgb(0, 0, 0, 0.4);
         color: #fff;
+      }
+
+      .fulladdr {
+        font-size: 75%;
+        margin-top: 0.5em;
+        color: transparent;
+        border: 1px dashed rgb(255, 255, 255, 0.5);
+      }
+
+      .fulladdr:hover {
+        color: inherit;
+        border-color: transparent;
       }
 
       #codeform {
