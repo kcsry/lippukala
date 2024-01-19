@@ -21,6 +21,9 @@
        * @property {Code[]} codes
        */
 
+      /** @type {Code|null} */
+      let codeToConfirm = null;
+
       /** @type {Record<number, Code>} */
       const codes = {};
 
@@ -106,10 +109,22 @@
         if (code.used || code.localUsed) {
           alert("Koodi näyttää jo käytetyltä!\nOta yhteys tapahtuman taloustiimiin asian selvittämiseksi.");
           return;
-        } // eslint-disable-next-line no-restricted-globals
-        if (!confirm(`Käytä koodi ${code.code}?`)) {
+        }
+        codeToConfirm = code;
+        $("#confirm-dialog").showModal();
+        $("#confirm-button").focus();
+      }
+
+      /**
+       * Form submit handler for the confirm form dialog.
+       */
+      function onConfirmCode() {
+        const code = codeToConfirm;
+        if (!code) {
+          alert("Koodi puuttuu, kummaa!");
           return;
         }
+        codeToConfirm = null;
         useCode(code);
         setTimeout(syncUseQueue, 4);
         setTimeout(() => {
@@ -181,6 +196,12 @@
         search(true);
       }
 
+      function cancelConfirm() {
+        const confirmDialog = $("#confirm-dialog");
+        if (confirmDialog.open) confirmDialog.close();
+        $("#code").focus();
+      }
+
       async function syncUseQueue() {
         useQueue = useQueue.filter((id) => codes[id].localUsed && !codes[id].used);
         if (!useQueue.length) {
@@ -222,15 +243,30 @@
         setInterval(syncUseQueue, 5000);
         $("#code").addEventListener("input", () => search(false), true);
         $("#codeform").addEventListener("submit", debounce(formSubmit, 250), true);
+        $("#confirm-form").addEventListener("submit", onConfirmCode, true);
+        $("#confirm-dialog").addEventListener("close", cancelConfirm, true);
       };
     </script>
     <style>
-      body,
-      input {
+      html {
         font:
-          36pt/1.2 Arial,
+          36pt/1.2 system-ui,
           sans-serif;
-        -webkit-transition: background 0.5s;
+      }
+
+      body {
+        overflow: hidden;
+        transition: background 0.5s;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body,
+      input,
+      button {
+        font: inherit;
       }
 
       body.code-unused {
@@ -252,6 +288,7 @@
         color: #fff;
         font-size: 48pt;
         padding: 12pt;
+        margin-bottom: 0.5rem;
       }
 
       .pfx {
@@ -259,20 +296,57 @@
       }
 
       .product {
-        margin: 0.5em;
-        padding: 0.5em;
-        background: #333;
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        background: rgb(0, 0, 0, 0.4);
         color: #fff;
-        border: 0.2em solid #000;
       }
 
-      form {
+      #codeform {
         margin: auto;
         text-align: center;
       }
 
       #code {
         width: 100%;
+        margin-bottom: 0.5rem;
+        padding: 0.25rem;
+      }
+
+      ::backdrop {
+        background-image: linear-gradient(to bottom, rgb(0, 0, 0, 0.8), rgb(0, 0, 0, 0.4), rgb(0, 0, 0, 0.8));
+      }
+
+      #confirm-dialog {
+        min-width: 15em;
+        backdrop-filter: blur(5px);
+        background: rgba(255, 255, 255, 0.85);
+        text-align: center;
+        font-size: 0.75em;
+        padding: 0.5rem;
+      }
+
+      #confirm-dialog form {
+        display: inline;
+      }
+
+      #confirm-dialog button {
+        margin: 0.5em;
+        margin-bottom: 0;
+        padding: 0.25em 0.75em;
+        border-width: 0;
+        border-bottom-width: 0.1em;
+      }
+
+      #confirm-button {
+        background: lightgreen;
+        border-bottom-color: forestgreen;
+        font-weight: bold;
+      }
+
+      #cancel-button {
+        background: orangered;
+        border-bottom-color: firebrick;
       }
     </style>
   </head>
@@ -281,5 +355,14 @@
       <input placeholder="koodi tähän" type="text" id="code" autofocus autocomplete="no" /><br />
       <div id="status">&nbsp;</div>
     </form>
+    <dialog id="confirm-dialog">
+      Käytä koodi?
+      <div>
+        <form method="dialog" id="confirm-form">
+          <button id="confirm-button">Käytä</button>
+        </form>
+        <button id="cancel-button" onclick="cancelConfirm()">Peruuta</button>
+      </div>
+    </dialog>
   </body>
 </html>
