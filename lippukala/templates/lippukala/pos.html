@@ -58,9 +58,7 @@
       }
 
       function Tee(template, env) {
-        return template.replace(/\{(.+?)\}/g, (_, m) =>
-          escapeHtml(env[m] || "").replace(/\n/g, "<br>"),
-        );
+        return template.replace(/\{(.+?)\}/g, (_, m) => escapeHtml(env[m] || "").replace(/\n/g, "<br>"));
       }
 
       /**
@@ -92,9 +90,7 @@
        */
       function confirmUseCode(code) {
         if (code.used || code.localUsed) {
-          alert(
-            "Koodi näyttää jo käytetyltä!\nOta yhteys tapahtuman taloustiimiin asian selvittämiseksi.",
-          );
+          alert("Koodi näyttää jo käytetyltä!\nOta yhteys tapahtuman taloustiimiin asian selvittämiseksi.");
           return;
         } // eslint-disable-next-line no-restricted-globals
         if (!confirm(`Käytä koodi ${code.code}?`)) {
@@ -141,8 +137,7 @@
           showCode(lastCode);
           if (enter) confirmUseCode(lastCode);
         } else if (nStarting === 0) {
-          statusDiv.innerHTML =
-            "Koodilla ei löydy yhtään lippua. Ole hyvä ja tarkista oikeinkirjoitus ja tapahtuma!";
+          statusDiv.innerHTML = "Koodilla ei löydy yhtään lippua. Ole hyvä ja tarkista oikeinkirjoitus ja tapahtuma!";
         } else {
           statusDiv.innerHTML = `... ${nStarting} ...`;
         }
@@ -158,9 +153,7 @@
       }
 
       async function syncUseQueue() {
-        useQueue = useQueue.filter(
-          (id) => codes[id].localUsed && !codes[id].used,
-        );
+        useQueue = useQueue.filter((id) => codes[id].localUsed && !codes[id].used);
         if (!useQueue.length) {
           return;
         }
@@ -202,9 +195,7 @@
         codeInput = document.getElementById("code");
         statusDiv = document.getElementById("status");
         codeInput.addEventListener("input", keyPress, true);
-        document
-          .getElementById("codeform")
-          .addEventListener("submit", debounce(formSubmit, 250), true);
+        document.getElementById("codeform").addEventListener("submit", debounce(formSubmit, 250), true);
       };
     </script>
     <style>
@@ -261,13 +252,7 @@
   </head>
   <body onload="init()">
     <form id="codeform">
-      <input
-        placeholder="koodi tähän"
-        type="text"
-        id="code"
-        autofocus
-        autocomplete="no"
-      /><br />
+      <input placeholder="koodi tähän" type="text" id="code" autofocus autocomplete="no" /><br />
       <div id="status">&nbsp;</div>
     </form>
   </body>
