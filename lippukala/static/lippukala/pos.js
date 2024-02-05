@@ -38,6 +38,14 @@ function $(id) {
   return el;
 }
 
+function addLogEntry(string) {
+  const time = new Date().toLocaleTimeString("fi-FI");
+  const messageWithTime = `${time}: ${string}\n`;
+  const logTextArea = $("log");
+  logTextArea.value += messageWithTime;
+  logTextArea.scroll(0, 90000);
+}
+
 /**
  * @param {CodesResponse} data
  */
@@ -45,7 +53,6 @@ function parseData(data) {
   for (const code of data.codes) {
     codes[code.id] = { ...(codes[code.id] || {}), ...code };
   }
-  console.log(`Got ${data.codes.length} codes`);
 }
 
 async function download() {
@@ -217,9 +224,12 @@ async function syncUseQueue() {
     method: "POST",
     body: formData,
   });
-  if (!resp.ok) throw new Error(`Failed to sync use queue`);
+  if (!resp.ok) {
+    addLogEntry("Koodien synkronointi epäonnistui");
+    throw new Error(`Failed to sync use queue`);
+  }
   const data = await resp.json();
-  console.log(`successfully synced ${useQueue.length} code uses`);
+  addLogEntry(`Käytettiin ${useQueue.length} koodia`);
   parseData(data);
   if (currentlyShownId) showCode(codes[currentlyShownId]);
 }
@@ -242,6 +252,7 @@ function debounce(fn, delay) {
 
 window.init = async function init() {
   await download();
+  addLogEntry(`${Object.keys(codes).length} koodia`);
   setInterval(download, (50 + Math.random() * 20) * 1000);
   setInterval(syncUseQueue, 5000);
   $("#code").addEventListener("input", () => search(false), true);
