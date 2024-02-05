@@ -1,12 +1,13 @@
 html {
   font:
-    36pt/1.2 system-ui,
+    32pt/1.2 system-ui,
     sans-serif;
 }
 
 body {
   overflow: hidden;
   transition: background 0.5s;
+  margin: 0;
 }
 
 * {
@@ -69,10 +70,11 @@ body.code-used {
   text-align: center;
 }
 
-#code {
+input#code {
   width: 100%;
   margin-bottom: 0.5rem;
   padding: 0.25rem;
+  border: none;
 }
 
 ::backdrop {
