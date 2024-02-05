@@ -71,6 +71,12 @@ body.code-used-here .statustext {
   color: #fff;
 }
 
+.check-year .product {
+  background: rgb(255, 255, 0, 0.8);
+  color: #000;
+  animation: blink 0.7s infinite;
+}
+
 .fulladdr {
   font-size: 75%;
   margin-top: 0.5em;

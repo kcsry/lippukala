@@ -35,6 +35,9 @@ let useQueue = [];
 /** @type {number|null} */
 let currentlyShownId = null;
 
+/** The current year, as a string. */
+const thisYearString = String(new Date().getFullYear());
+
 /**
  * @param {string} id ID or selector
  * @returns {HTMLElement}
@@ -115,6 +118,15 @@ function getCodeStatusText(code) {
 }
 
 /**
+ * Return if the code seems to be for a product that is not for this year.
+ * @param code {Code}
+ */
+function isPossiblyOldCode(code) {
+  const yearMatch = /\b(20\d{2})\b/g.exec(code.prod);
+  return yearMatch && yearMatch[1] !== thisYearString;
+}
+
+/**
  * @param {Code|null} code
  */
 function showCode(code) {
@@ -125,6 +137,7 @@ function showCode(code) {
       "<div class=cd><span class=pfx>{prefix}</span>{code}</div>{lit}<div class=product>{prod}</div><div class=statustext>{statusText}</div></div><div class=addr>{short_name}<div class=fulladdr>{name}</div></div><div class=comment>{comment}</div>",
       { ...code, short_name: shortenName(code.name), statusText: getCodeStatusText(code) },
     );
+    statusDiv.classList.toggle("check-year", isPossiblyOldCode(code));
     document.body.className = getCodeCSSClass(code);
   } else {
     currentlyShownId = null;
