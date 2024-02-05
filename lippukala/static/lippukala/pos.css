@@ -24,13 +24,31 @@ body.code-unused {
   background: #00c300;
 }
 
-body.code-localused {
+body.code-used-not-synced {
   background: #f95;
+}
+
+body.code-used-here {
+  background: cornflowerblue;
 }
 
 body.code-used {
   background: #e51e1f;
   color: yellow;
+}
+
+.statustext {
+  font-weight: bold;
+  transition: color 1s;
+  margin-bottom: 0.5em;
+}
+
+body.code-used .statustext {
+  animation: blink 1s infinite;
+}
+
+body.code-used-here .statustext {
+  color: #fff;
 }
 
 .cd {
@@ -132,4 +150,19 @@ textarea#log {
 textarea#log:hover {
   opacity: 1;
   height: 25em;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
