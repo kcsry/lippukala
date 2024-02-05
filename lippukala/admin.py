@@ -1,6 +1,7 @@
 from django.contrib.admin import site
 from django.contrib.admin.options import ModelAdmin, TabularInline
 
+from lippukala.consts import UNUSED
 from lippukala.models import Code, Order
 
 
@@ -50,6 +51,12 @@ class CodeAdmin(ModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
+    def save_model(self, request, obj: Code, form, change):
+        if obj.status == UNUSED:
+            obj.used_at = ""
+            obj.used_on = None
+        super().save_model(request, obj, form, change)
 
 
 site.register(Order, OrderAdmin)
