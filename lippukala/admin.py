@@ -4,6 +4,8 @@ from django.contrib.admin.options import ModelAdmin, TabularInline
 from lippukala.consts import UNUSED
 from lippukala.models import Code, Order
 
+FIELDS_OF_EXTRA_INTEREST = {"status", "used_at", "used_on"}
+
 
 class CodeInline(TabularInline):
     model = Code
@@ -53,10 +55,28 @@ class CodeAdmin(ModelAdmin):
         return False
 
     def save_model(self, request, obj: Code, form, change):
+        changed = set(form.changed_data)
+        if changed & FIELDS_OF_EXTRA_INTEREST:
+            old_values = Code.objects.filter(pk=obj.pk).values(*FIELDS_OF_EXTRA_INTEREST).first()
+            obj._change_message_extra = {
+                "lippukala": {
+                    key: [old_value, getattr(obj, key)]
+                    for (key, old_value)
+                    in old_values.items()
+                    if old_value != getattr(obj, key)
+                },
+            }
         if obj.status == UNUSED:
             obj.used_at = ""
             obj.used_on = None
         super().save_model(request, obj, form, change)
+
+    def construct_change_message(self, request, form, formsets, add=False):
+        change_message = super().construct_change_message(request, form, formsets, add)
+        if hasattr(form.instance, "_change_message_extra"):
+            assert isinstance(change_message, list)
+            change_message = [form.instance._change_message_extra, *change_message]
+        return change_message
 
 
 site.register(Order, OrderAdmin)
