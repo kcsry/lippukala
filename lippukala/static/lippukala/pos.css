@@ -1,0 +1,112 @@
+html {
+  font:
+    36pt/1.2 system-ui,
+    sans-serif;
+}
+
+body {
+  overflow: hidden;
+  transition: background 0.5s;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body,
+input,
+button {
+  font: inherit;
+}
+
+body.code-unused {
+  background: #00c300;
+}
+
+body.code-localused {
+  background: #f95;
+}
+
+body.code-used {
+  background: #e51e1f;
+  color: yellow;
+}
+
+.cd {
+  font-family: consolas, monospace;
+  background: #000;
+  color: #fff;
+  font-size: 48pt;
+  padding: 12pt;
+  margin-bottom: 0.5rem;
+}
+
+.pfx {
+  opacity: 0.6;
+}
+
+.product {
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  background: rgb(0, 0, 0, 0.4);
+  color: #fff;
+}
+
+.fulladdr {
+  font-size: 75%;
+  margin-top: 0.5em;
+  color: transparent;
+  border: 1px dashed rgb(255, 255, 255, 0.5);
+}
+
+.fulladdr:hover {
+  color: inherit;
+  border-color: transparent;
+}
+
+#codeform {
+  margin: auto;
+  text-align: center;
+}
+
+#code {
+  width: 100%;
+  margin-bottom: 0.5rem;
+  padding: 0.25rem;
+}
+
+::backdrop {
+  background-image: linear-gradient(to bottom, rgb(0, 0, 0, 0.8), rgb(0, 0, 0, 0.4), rgb(0, 0, 0, 0.8));
+}
+
+#confirm-dialog {
+  min-width: 15em;
+  backdrop-filter: blur(5px);
+  background: rgba(255, 255, 255, 0.85);
+  text-align: center;
+  font-size: 0.75em;
+  padding: 0.5rem;
+}
+
+#confirm-dialog form {
+  display: inline;
+}
+
+#confirm-dialog button {
+  margin: 0.5em;
+  margin-bottom: 0;
+  padding: 0.25em 0.75em;
+  border-width: 0;
+  border-bottom-width: 0.1em;
+}
+
+#confirm-button {
+  background: lightgreen;
+  border-bottom-color: forestgreen;
+  font-weight: bold;
+}
+
+#cancel-button {
+  background: orangered;
+  border-bottom-color: firebrick;
+}
