@@ -1,14 +1,14 @@
 /**
  * @typedef {Object} Code
- * @property {number} id
  * @property {boolean} used
- * @property {string} code
- * @property {string} prefix
- * @property {string} lit
+ * @property {string|null} used_ts
+ * @property {number} id
  * @property {string} [name]
+ * @property {string} code
  * @property {string} comment
+ * @property {string} lit
+ * @property {string} prefix
  * @property {string} prod
- * @property {boolean} [localUsed]
  */
 
 /**
@@ -22,11 +22,21 @@ let codeToConfirm = null;
 /** @type {Record<number, Code>} */
 const codes = {};
 
+/**
+ * A set of all code IDs used locally (not persistent
+ * between reloads)
+ * @type {Set<number>}
+ */
+const codeIdsUsedLocally = new Set();
+
 /** @type {number[]} */
 let useQueue = [];
 
 /** @type {number|null} */
 let currentlyShownId = null;
+
+/** The current year, as a string. */
+const thisYearString = String(new Date().getFullYear());
 
 /**
  * @param {string} id ID or selector
@@ -38,6 +48,14 @@ function $(id) {
   return el;
 }
 
+function addLogEntry(string) {
+  const time = new Date().toLocaleTimeString("fi-FI");
+  const messageWithTime = `${time}: ${string}\n`;
+  const logTextArea = $("log");
+  logTextArea.value += messageWithTime;
+  logTextArea.scroll(0, 90000);
+}
+
 /**
  * @param {CodesResponse} data
  */
@@ -45,7 +63,6 @@ function parseData(data) {
   for (const code of data.codes) {
     codes[code.id] = { ...(codes[code.id] || {}), ...code };
   }
-  console.log(`Got ${data.codes.length} codes`);
 }
 
 async function download() {
@@ -75,6 +92,41 @@ function Tee(template, env) {
 }
 
 /**
+ * @param code {Code}
+ */
+function isCodeLocallyUsed(code) {
+  return codeIdsUsedLocally.has(code.id);
+}
+
+function getCodeCSSClass(code) {
+  const isLocallyUsed = isCodeLocallyUsed(code);
+  if (code.used) {
+    return isLocallyUsed ? "code-used-here" : "code-used";
+  }
+  return isLocallyUsed ? "code-used-not-synced" : "code-unused";
+}
+
+function getCodeStatusText(code) {
+  const prettierTime = code.used_ts ? code.used_ts.replace(/T/, "\u2009") : "";
+  if (isCodeLocallyUsed(code)) {
+    return `Käytetty tässä ${prettierTime}`;
+  }
+  if (code.used) {
+    return `Käytetty ${prettierTime}`;
+  }
+  return "Ei käytetty";
+}
+
+/**
+ * Return if the code seems to be for a product that is not for this year.
+ * @param code {Code}
+ */
+function isPossiblyOldCode(code) {
+  const yearMatch = /\b(20\d{2})\b/g.exec(code.prod);
+  return yearMatch && yearMatch[1] !== thisYearString;
+}
+
+/**
  * @param {Code|null} code
  */
 function showCode(code) {
@@ -82,13 +134,11 @@ function showCode(code) {
   if (code) {
     currentlyShownId = code.id;
     statusDiv.innerHTML = Tee(
-      "<div class=cd><span class=pfx>{prefix}</span>{code}</div>{lit}<div class=product>{prod}</div><div class=addr>{short_name}<div class=fulladdr>{name}</div></div><div class=comment>{comment}</div>",
-      { ...code, short_name: shortenName(code.name) },
+      "<div class=cd><span class=pfx>{prefix}</span>{code}</div>{lit}<div class=product>{prod}</div><div class=statustext>{statusText}</div></div><div class=addr>{short_name}<div class=fulladdr>{name}</div></div><div class=comment>{comment}</div>",
+      { ...code, short_name: shortenName(code.name), statusText: getCodeStatusText(code) },
     );
-    let cls = "code-unused";
-    if (code.used) cls = "code-used";
-    else if (code.localUsed) cls = "code-localused";
-    document.body.className = cls;
+    statusDiv.classList.toggle("check-year", isPossiblyOldCode(code));
+    document.body.className = getCodeCSSClass(code);
   } else {
     currentlyShownId = null;
     statusDiv.innerHTML = "";
@@ -100,7 +150,7 @@ function showCode(code) {
  * @param {Code} code
  */
 function useCode(code) {
-  code.localUsed = true;
+  codeIdsUsedLocally.add(code.id);
   useQueue.push(code.id);
   showCode(code);
 }
@@ -206,7 +256,7 @@ function cancelConfirm() {
 }
 
 async function syncUseQueue() {
-  useQueue = useQueue.filter((id) => codes[id].localUsed && !codes[id].used);
+  useQueue = useQueue.filter((id) => isCodeLocallyUsed(codes[id]) && !codes[id].used);
   if (!useQueue.length) {
     return;
   }
@@ -217,9 +267,12 @@ async function syncUseQueue() {
     method: "POST",
     body: formData,
   });
-  if (!resp.ok) throw new Error(`Failed to sync use queue`);
+  if (!resp.ok) {
+    addLogEntry("Koodien synkronointi epäonnistui");
+    throw new Error(`Failed to sync use queue`);
+  }
   const data = await resp.json();
-  console.log(`successfully synced ${useQueue.length} code uses`);
+  addLogEntry(`Käytettiin ${useQueue.length} koodia`);
   parseData(data);
   if (currentlyShownId) showCode(codes[currentlyShownId]);
 }
@@ -242,6 +295,7 @@ function debounce(fn, delay) {
 
 window.init = async function init() {
   await download();
+  addLogEntry(`${Object.keys(codes).length} koodia`);
   setInterval(download, (50 + Math.random() * 20) * 1000);
   setInterval(syncUseQueue, 5000);
   $("#code").addEventListener("input", () => search(false), true);

@@ -8,16 +8,17 @@ from lippukala.excs import CantUseException
 from lippukala.models import Code
 
 
-def serialize_code(code):
+def serialize_code(code: Code) -> dict:
     return {
-        "id": code.id,
-        "used": bool(code.used_at),
         "code": code.code,
-        "prefix": code.prefix,
+        "comment": code.order.comment,
+        "id": code.id,
         "lit": code.literate_code,
         "name": code.order.address_text,
-        "comment": code.order.comment,
+        "prefix": code.prefix,
         "prod": code.product_text,
+        "used": code.is_used,
+        "used_ts": code.used_on.isoformat(timespec="minutes") if code.used_on else None,
     }
 
 

@@ -1,12 +1,13 @@
 html {
   font:
-    36pt/1.2 system-ui,
+    32pt/1.2 system-ui,
     sans-serif;
 }
 
 body {
   overflow: hidden;
   transition: background 0.5s;
+  margin: 0;
 }
 
 * {
@@ -23,13 +24,31 @@ body.code-unused {
   background: #00c300;
 }
 
-body.code-localused {
+body.code-used-not-synced {
   background: #f95;
+}
+
+body.code-used-here {
+  background: cornflowerblue;
 }
 
 body.code-used {
   background: #e51e1f;
   color: yellow;
+}
+
+.statustext {
+  font-weight: bold;
+  transition: color 1s;
+  margin-bottom: 0.5em;
+}
+
+body.code-used .statustext {
+  animation: blink 1s infinite;
+}
+
+body.code-used-here .statustext {
+  color: #fff;
 }
 
 .cd {
@@ -52,6 +71,12 @@ body.code-used {
   color: #fff;
 }
 
+.check-year .product {
+  background: rgb(255, 255, 0, 0.8);
+  color: #000;
+  animation: blink 0.7s infinite;
+}
+
 .fulladdr {
   font-size: 75%;
   margin-top: 0.5em;
@@ -69,10 +94,11 @@ body.code-used {
   text-align: center;
 }
 
-#code {
+input#code {
   width: 100%;
   margin-bottom: 0.5rem;
   padding: 0.25rem;
+  border: none;
 }
 
 ::backdrop {
@@ -109,4 +135,40 @@ body.code-used {
 #cancel-button {
   background: orangered;
   border-bottom-color: firebrick;
+}
+
+textarea#log {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  min-width: 30em;
+  height: 15em;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: 8pt;
+  opacity: 0.3;
+  transition:
+    height 0.2s,
+    opacity 0.2s;
+}
+
+textarea#log:hover {
+  opacity: 1;
+  height: 25em;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
