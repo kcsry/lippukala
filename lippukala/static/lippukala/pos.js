@@ -341,7 +341,7 @@ window.init = async function init() {
   $("#confirm-form").addEventListener("submit", onConfirmCode, true);
   $("#confirm-dialog").addEventListener("close", cancelConfirm, true);
   $("#camera-btn").addEventListener("click", () => handleCameraClick(), true);
-  if (!PosQR.hasBarcodeDetector()) {
+  if (!PosQR.available()) {
     $("#camera-btn").hidden = true;
   }
   $("#clear-btn").addEventListener(

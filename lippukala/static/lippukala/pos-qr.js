@@ -16,9 +16,47 @@ class PosQRNative {
   }
 }
 
+class PosQRZbar {
+  constructor(width) {
+    this.width = width;
+    this.zbar = null;
+  }
+
+  async init() {
+    this.zbar = await import("https://cdn.jsdelivr.net/npm/@undecaf/zbar-wasm@0.10.1/dist/inlined/index.mjs");
+    const canvas = document.createElement("canvas");
+    canvas.id = "posqr-canvas";
+    document.body.appendChild(canvas);
+    this.canvas = canvas;
+    this.context = canvas.getContext("2d", { willReadFrequently: true });
+  }
+
+  async detectFromVideo(video) {
+    const { canvas, width, zbar, context } = this;
+    if (!zbar) {
+      throw new Error("Zbar not initialized");
+    }
+    const height = width * (video.videoHeight / video.videoWidth);
+    canvas.width = width;
+    canvas.height = height;
+    context.drawImage(video, 0, 0, width, height);
+    const imageData = context.getImageData(0, 0, width, height);
+    const symbols = await zbar.scanImageData(imageData);
+    return symbols.map((symbol) => ({ ...symbol, rawValue: symbol.decode() }));
+  }
+}
+
 class PosQR {
   static hasBarcodeDetector() {
     return typeof BarcodeDetector !== "undefined";
+  }
+
+  static hasWebAssembly() {
+    return typeof WebAssembly !== "undefined";
+  }
+
+  static available() {
+    return this.hasBarcodeDetector() || this.hasWebAssembly();
   }
 
   constructor({ addLogEntry, onFoundQRCode }) {
@@ -37,12 +75,13 @@ class PosQR {
   }
 
   async init() {
-    if (PosQR.hasBarcodeDetector()) {
+    const forceZbar = new URLSearchParams(window.location.search).has("zbar");
+    if (PosQR.hasBarcodeDetector() && !forceZbar) {
       this.addLogEntry("Käytetään sisäänrakennettua QR-koodinlukijaa");
       this.detector = new PosQRNative();
     } else {
-      this.addLogEntry("Ei QR-koodinlukijaa");
-      throw new Error("No QR code detector");
+      this.addLogEntry("Ladataan Zbar-QR-koodinlukijaa...");
+      this.detector = new PosQRZbar(480);
     }
     await this.detector.init();
     this.addLogEntry("QR-koodinlukija valmis");
