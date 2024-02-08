@@ -109,6 +109,10 @@ body.code-used-here .statustext {
   border-left: 1px solid #333;
 }
 
+#camera-btn.started {
+  background: linear-gradient(to bottom, #a3cb38, #009432);
+}
+
 input#code {
   padding: 0.25rem;
   border: none;
@@ -187,6 +191,22 @@ textarea#log:hover {
   100% {
     opacity: 0;
   }
+}
+
+#posqr-video {
+  display: none;
+}
+
+#posqr-canvas {
+  display: none;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  max-width: 20vw;
+}
+
+#posqr-canvas.started {
+  display: block;
 }
 
 @media (max-width: 550px) {
