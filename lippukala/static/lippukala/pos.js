@@ -1,3 +1,5 @@
+/* globals PosQR */
+
 /**
  * @typedef {Object} Code
  * @property {boolean} used
@@ -37,6 +39,9 @@ let currentlyShownId = null;
 
 /** The current year, as a string. */
 const thisYearString = String(new Date().getFullYear());
+
+/** @type {PosQR|null} */
+let posQR = null;
 
 /**
  * @param {string} id ID or selector
@@ -301,6 +306,29 @@ function debounce(fn, delay) {
   };
 }
 
+async function handleCameraClick() {
+  if (!posQR) {
+    posQR = new PosQR({
+      addLogEntry,
+      onFoundQRCode: ({ rawValue }) => {
+        const text = rawValue.trim();
+        if (/^\d+$/.test(text)) {
+          $("#code").value = text;
+          search(true);
+        } else {
+          this.addLogEntry(`QR-koodi ei ole numero: ${text}`);
+        }
+      },
+    });
+  }
+  if (posQR.isStarted()) {
+    await posQR.stop();
+  } else {
+    await posQR.start();
+  }
+  $("#camera-btn").classList.toggle("started", posQR.isStarted());
+}
+
 window.init = async function init() {
   showCode(null); // reset dom state
   search(false); // reset dom state
@@ -312,6 +340,10 @@ window.init = async function init() {
   $("#codeform").addEventListener("submit", debounce(formSubmit, 250), true);
   $("#confirm-form").addEventListener("submit", onConfirmCode, true);
   $("#confirm-dialog").addEventListener("close", cancelConfirm, true);
+  $("#camera-btn").addEventListener("click", () => handleCameraClick(), true);
+  if (!PosQR.hasBarcodeDetector()) {
+    $("#camera-btn").hidden = true;
+  }
   $("#clear-btn").addEventListener(
     "click",
     () => {
