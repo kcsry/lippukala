@@ -2,14 +2,17 @@
 <html lang="fi">
   <head>
     <title>POS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="{% static 'lippukala/pos.css' %}" />
     <script src="{% static 'lippukala/pos.js' %}"></script>
   </head>
   <body onload="init()">
     <form id="codeform">
-      <input placeholder="koodi tähän" type="text" id="code" autofocus autocomplete="off" /><br />
-      <div id="status">&nbsp;</div>
+      <input placeholder="koodi tähän" type="search" id="code" autofocus autocomplete="off" />
+      <button type="button" id="accept-btn">&#x2705;</button>
+      <button type="button" id="clear-btn">&#x274C;</button>
     </form>
+    <div id="status">&nbsp;</div>
     <dialog id="confirm-dialog">
       Käytä koodi?
       <div>

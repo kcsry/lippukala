@@ -1,20 +1,21 @@
-html {
-  font:
-    32pt/1.2 system-ui,
-    sans-serif;
-}
-
-body {
-  overflow: hidden;
-  transition: background 0.5s;
-  margin: 0;
-}
-
 * {
   box-sizing: border-box;
 }
 
-body,
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  overflow-y: hidden;
+  transition: background 0.5s;
+  margin: 0;
+  line-height: 1.2;
+  font-size: 32pt;
+  font-family: system-ui, sans-serif;
+}
+
 input,
 button {
   font: inherit;
@@ -55,7 +56,7 @@ body.code-used-here .statustext {
   font-family: consolas, monospace;
   background: #000;
   color: #fff;
-  font-size: 48pt;
+  font-size: 150%;
   padding: 12pt;
   margin-bottom: 0.5rem;
 }
@@ -89,16 +90,31 @@ body.code-used-here .statustext {
   border-color: transparent;
 }
 
-#codeform {
+#status {
   margin: auto;
   text-align: center;
 }
 
-input#code {
-  width: 100%;
+#codeform {
+  display: flex;
+  width: 100vw;
   margin-bottom: 0.5rem;
+  border-bottom: 3px solid #333;
+}
+
+#codeform button {
+  min-width: 2.5em;
+  background: linear-gradient(to bottom, #c8d6e5, #8395a7);
+  border: 0;
+  border-left: 1px solid #333;
+}
+
+input#code {
   padding: 0.25rem;
   border: none;
+  flex: 1 1 auto;
+  min-width: 0; /* fixes mobile bullshit */
+  border-radius: 0;
 }
 
 ::backdrop {
@@ -170,5 +186,17 @@ textarea#log:hover {
   }
   100% {
     opacity: 0;
+  }
+}
+
+@media (max-width: 550px) {
+  body {
+    font-size: 20pt;
+  }
+  textarea#log {
+    max-height: 8em;
+    min-width: auto;
+    max-width: none;
+    left: 0;
   }
 }
