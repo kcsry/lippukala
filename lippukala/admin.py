@@ -61,8 +61,7 @@ class CodeAdmin(ModelAdmin):
             obj._change_message_extra = {
                 "lippukala": {
                     key: [old_value, getattr(obj, key)]
-                    for (key, old_value)
-                    in old_values.items()
+                    for (key, old_value) in old_values.items()
                     if old_value != getattr(obj, key)
                 },
             }

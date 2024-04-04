@@ -50,14 +50,10 @@ class CodeReportWriter:
         else:
             return sio.getvalue()
 
-    def _format_delimited_report(
-        self, filename, as_response, field_delimiter=";", record_delimiter="\r\n"
-    ):
+    def _format_delimited_report(self, filename, as_response, field_delimiter=";", record_delimiter="\r\n"):
         content_type = f"text/csv; charset={settings.DEFAULT_CHARSET}"
 
-        iterator = (
-            field_delimiter.join(fields) + record_delimiter for fields in self.get_fields_iterator()
-        )
+        iterator = (field_delimiter.join(fields) + record_delimiter for fields in self.get_fields_iterator())
         if as_response:
             response = HttpResponse(iterator, content_type=content_type)
             response["Content-Disposition"] = f"attachment; filename={filename}"

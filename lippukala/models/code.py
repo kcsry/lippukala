@@ -20,9 +20,7 @@ class Code(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     status = models.IntegerField(choices=CODE_STATUS_CHOICES, default=UNUSED)
     used_on = models.DateTimeField(blank=True, null=True)
-    used_at = models.CharField(
-        max_length=64, blank=True, help_text="Station at which code was used"
-    )
+    used_at = models.CharField(max_length=64, blank=True, help_text="Station at which code was used")
     prefix = models.CharField(max_length=16, blank=True, editable=False)
     code = models.CharField(max_length=64, unique=True, editable=False)
     literate_code = models.CharField(max_length=256, blank=True, editable=False)
@@ -75,13 +73,9 @@ class Code(models.Model):
 
     def _check_sanity(self):
         if self.used_on and self.status != USED:
-            raise ValueError(
-                "Un-sane situation detected: saving Code with used status and no usage date"
-            )
+            raise ValueError("Un-sane situation detected: saving Code with used status and no usage date")
         if self.status != UNUSED and not self.pk:
-            raise ValueError(
-                "Un-sane situation detected: initial save of code with non-virgin status!"
-            )
+            raise ValueError("Un-sane situation detected: initial save of code with non-virgin status!")
         if not all(c in digits for c in self.full_code):
             raise ValueError(
                 "Un-sane situation detected: full_code contains non-digits. "
@@ -90,9 +84,7 @@ class Code(models.Model):
         if not settings.PREFIX_MAY_BE_BLANK and not self.prefix:
             raise ValueError("Un-sane situation detected: prefix may not be blank")
         if self.prefix and self.prefix not in settings.PREFIXES:
-            raise ValueError(
-                f"Un-sane situation detected: prefix {self.prefix!r} is not in PREFIXES"
-            )
+            raise ValueError(f"Un-sane situation detected: prefix {self.prefix!r} is not in PREFIXES")
 
     def save(self, *args, **kwargs):
         if not self.code:
