@@ -64,9 +64,11 @@ module = "xlwt.*"
 ignore_missing_imports = true
 
 [tool.ruff]
-exclude = ["migrations"]
-ignore = []
 line-length = 110
+extend-exclude = ["migrations"]
+
+[tool.ruff.lint]
+ignore = []
 select = [
     "C9",
     "E",
@@ -75,5 +77,5 @@ select = [
     "W",
 ]
 
-[tool.ruff.mccabe]
+[tool.ruff.lint.mccabe]
 max-complexity = 10
