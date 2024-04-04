@@ -78,3 +78,17 @@ select = [
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
+
+[tool.coverage.report]
+omit = [
+    "*management*",
+    "*migrations*",
+    "*site-packages*",
+]
+
+exclude_also = [
+    "@(abc\\.)?abstractmethod",
+    "pragma: no cover",
+    "raise AssertionError",
+    "raise NotImplementedError",
+]
