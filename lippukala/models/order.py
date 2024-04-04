@@ -2,7 +2,6 @@ from django.db import models
 
 
 class Order(models.Model):
-
     """Encapsulates an order, which may contain zero or more codes.
 
     :var event: An (optional) event identifier for this order. May be used at the client app's discretion.

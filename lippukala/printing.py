@@ -173,9 +173,7 @@ class OrderPrinter:
             page_id_text = "Sivu %d" % self.canvas._pageNumber
             if order.reference_number:
                 page_id_text += f" - Viitenumero: {order.reference_number}"
-            self.canvas.drawString(
-                self.PAGE_MARGIN_X, self.PAGE_HEIGHT - self.PAGE_MARGIN_Y, page_id_text
-            )
+            self.canvas.drawString(self.PAGE_MARGIN_X, self.PAGE_HEIGHT - self.PAGE_MARGIN_Y, page_id_text)
             self.draw_y = self._align_draw_y(self.PAGE_HEIGHT - self.PAGE_MARGIN_Y - 10 * mm)
 
         ticket_width = self.PAGE_WIDTH - 2 * self.PAGE_MARGIN_X

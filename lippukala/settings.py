@@ -76,9 +76,7 @@ def _validate_print():
                 f"PRINT_LOGO_PATH was defined, but does not exist ({PRINT_LOGO_PATH!r})"
             )
         if not all(float(s) > 0 for s in PRINT_LOGO_SIZE_CM):
-            raise ImproperlyConfigured(
-                f"PRINT_LOGO_SIZE_CM values not valid: {PRINT_LOGO_SIZE_CM!r}"
-            )
+            raise ImproperlyConfigured(f"PRINT_LOGO_SIZE_CM values not valid: {PRINT_LOGO_SIZE_CM!r}")
 
 
 validate_settings()

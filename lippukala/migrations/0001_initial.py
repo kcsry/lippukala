@@ -5,42 +5,73 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = []  # type: ignore
 
     operations = [
         migrations.CreateModel(
-            name='Code',
+            name="Code",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('status', models.IntegerField(choices=[(0, 'Unused'), (1, 'Used'), (2, 'Manual intervention required'), (3, 'Beyond logic')], default=0)),
-                ('used_on', models.DateTimeField(blank=True, null=True)),
-                ('used_at', models.CharField(blank=True, help_text='Station at which code was used', max_length=64)),
-                ('prefix', models.CharField(choices=[('1', '1 [kissa]')], editable=False, max_length=16)),
-                ('code', models.CharField(editable=False, max_length=64, unique=True)),
-                ('literate_code', models.CharField(blank=True, editable=False, max_length=256)),
-                ('product_text', models.CharField(blank=True, editable=False, max_length=512)),
+                (
+                    "id",
+                    models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+                ),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                (
+                    "status",
+                    models.IntegerField(
+                        choices=[
+                            (0, "Unused"),
+                            (1, "Used"),
+                            (2, "Manual intervention required"),
+                            (3, "Beyond logic"),
+                        ],
+                        default=0,
+                    ),
+                ),
+                ("used_on", models.DateTimeField(blank=True, null=True)),
+                (
+                    "used_at",
+                    models.CharField(blank=True, help_text="Station at which code was used", max_length=64),
+                ),
+                ("prefix", models.CharField(choices=[("1", "1 [kissa]")], editable=False, max_length=16)),
+                ("code", models.CharField(editable=False, max_length=64, unique=True)),
+                ("literate_code", models.CharField(blank=True, editable=False, max_length=256)),
+                ("product_text", models.CharField(blank=True, editable=False, max_length=512)),
             ],
         ),
         migrations.CreateModel(
-            name='Order',
+            name="Order",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('event', models.CharField(blank=True, max_length=32)),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('modified_on', models.DateTimeField(auto_now=True)),
-                ('reference_number', models.CharField(blank=True, help_text='Reference number, unique', max_length=64, null=True, unique=True)),
-                ('address_text', models.TextField(blank=True, help_text='Text printed in the PDF address area')),
-                ('free_text', models.TextField(blank=True, help_text='Text printed on PDF')),
-                ('comment', models.TextField(blank=True, help_text='Administrative comment')),
+                (
+                    "id",
+                    models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+                ),
+                ("event", models.CharField(blank=True, max_length=32)),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("modified_on", models.DateTimeField(auto_now=True)),
+                (
+                    "reference_number",
+                    models.CharField(
+                        blank=True,
+                        help_text="Reference number, unique",
+                        max_length=64,
+                        null=True,
+                        unique=True,
+                    ),
+                ),
+                (
+                    "address_text",
+                    models.TextField(blank=True, help_text="Text printed in the PDF address area"),
+                ),
+                ("free_text", models.TextField(blank=True, help_text="Text printed on PDF")),
+                ("comment", models.TextField(blank=True, help_text="Administrative comment")),
             ],
         ),
         migrations.AddField(
-            model_name='code',
-            name='order',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='lippukala.Order'),
+            model_name="code",
+            name="order",
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="lippukala.Order"),
         ),
     ]
