@@ -36,20 +36,10 @@ include = [
     "/lippukala",
 ]
 
-[tool.black]
-line-length = 100
-extend-exclude = '''
-migrations/.*
-'''
-
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "lippukala_test_app.settings"
 norecursedirs = [".git", "venv*", "site-packages"]
 doctest_optionflags = ["NORMALIZE_WHITESPACE", "IGNORE_EXCEPTION_DETAIL", "ALLOW_UNICODE"]
-
-[tool.isort]
-profile = "black"
-multi_line_output = 3
 
 [[tool.mypy.overrides]]
 module = "django.*"
@@ -78,3 +68,17 @@ select = [
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
+
+[tool.coverage.report]
+omit = [
+    "*management*",
+    "*migrations*",
+    "*site-packages*",
+]
+
+exclude_also = [
+    "@(abc\\.)?abstractmethod",
+    "pragma: no cover",
+    "raise AssertionError",
+    "raise NotImplementedError",
+]

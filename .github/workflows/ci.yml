@@ -24,7 +24,7 @@ jobs:
       - run: pip install tox-gh-actions tox
       - run: tox
       - uses: codecov/codecov-action@v4
-  Lint:
+  Lint-Backend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -35,6 +35,16 @@ jobs:
           cache-dependency-path: |
             pyproject.toml
       - uses: pre-commit/action@v3.0.1
+  Lint-Frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          cache: npm
+          cache-dependency-path: package.json
+      - run: npm i
+      - run: npm run lint
   Build:
     runs-on: ubuntu-latest
     steps:
