@@ -23,6 +23,7 @@ class PosQRZbar {
   }
 
   async init() {
+    // eslint-disable-next-line import/extensions,import/no-unresolved
     this.zbar = await import("https://cdn.jsdelivr.net/npm/@undecaf/zbar-wasm@0.10.1/dist/inlined/index.mjs");
     const canvas = document.createElement("canvas");
     canvas.id = "posqr-canvas";
