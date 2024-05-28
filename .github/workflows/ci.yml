@@ -21,9 +21,11 @@ jobs:
           cache: pip
           cache-dependency-path: |
             pyproject.toml
-      - run: pip install tox-gh-actions tox
+      - run: pip install tox-gh-actions tox tox-uv
       - run: tox
       - uses: codecov/codecov-action@v4
+        with:
+          directory: .tox/coverage
   Lint-Backend:
     runs-on: ubuntu-latest
     steps:
