@@ -10,6 +10,7 @@ jobs:
   Test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
@@ -21,9 +22,11 @@ jobs:
           cache: pip
           cache-dependency-path: |
             pyproject.toml
-      - run: pip install tox-gh-actions tox
+      - run: pip install tox-gh-actions tox tox-uv
       - run: tox
       - uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: 950d92fa-25d7-4471-99b6-a11b82ba3847
   Lint-Backend:
     runs-on: ubuntu-latest
     steps:

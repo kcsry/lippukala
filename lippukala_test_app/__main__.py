@@ -8,10 +8,10 @@ def seed():
     import django
 
     django.setup()
-    from lippukala_tests.utils import _create_test_order
+    from lippukala_tests.utils import create_test_order
 
     for x in range(20):
-        print(_create_test_order().pk)
+        print(create_test_order(None).pk)
 
 
 def manage():

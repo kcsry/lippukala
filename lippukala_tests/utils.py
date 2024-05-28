@@ -1,16 +1,27 @@
+from __future__ import annotations
+
 import random
 import time
 
 from django.utils.encoding import force_str
 
+from lippukala.adapter import LippukalaAdapter
 from lippukala.models import Code, Order
 
 
-def _create_test_order():
+def create_test_order(adapter: LippukalaAdapter | None) -> Order:
     fname = random.choice(["Teppo", "Tatu", "Tauno", "Tintti", "Taika"])
+    address_text = "\n".join(
+        (
+            f"{fname} Testinen",
+            f"Testikatu {random.randint(1, 50):d}",
+            f"{random.randint(0, 99999):05d} Turku",
+            "Finland",
+        )
+    )
     order = Order.objects.create(
-        address_text="%s Testinen\nTestikatu %d\n%05d Turku\nFinland"
-        % (fname, random.randint(1, 50), random.randint(0, 99999)),
+        adapter=adapter,
+        address_text=address_text,
         free_text="Tervetuloa Testiconiin!",
         comment=f"{fname} on kiva jätkä.",
         reference_number=str(int(time.time() * 10000 + random.randint(0, 35474500))),
