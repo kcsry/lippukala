@@ -1,3 +1,6 @@
+import datetime
+import json
+
 from django.contrib.admin import site
 from django.contrib.admin.options import ModelAdmin, TabularInline
 
@@ -30,6 +33,14 @@ def order_details(code):
 order_details.short_description = "Order"  # type: ignore[attr-defined]
 
 
+def maybe_stringify(val):
+    if isinstance(val, (datetime.date, datetime.time, datetime.datetime)):
+        return val.isoformat()
+    if isinstance(val, (dict, list)):
+        return json.dumps(val, default=str)
+    return val
+
+
 class CodeAdmin(ModelAdmin):
     search_fields = [
         "code",
@@ -60,7 +71,7 @@ class CodeAdmin(ModelAdmin):
             old_values = Code.objects.filter(pk=obj.pk).values(*FIELDS_OF_EXTRA_INTEREST).first()
             obj._change_message_extra = {
                 "lippukala": {
-                    key: [old_value, getattr(obj, key)]
+                    key: [maybe_stringify(old_value), maybe_stringify(getattr(obj, key))]
                     for (key, old_value) in old_values.items()
                     if old_value != getattr(obj, key)
                 },
