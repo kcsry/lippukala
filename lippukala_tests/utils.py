@@ -9,8 +9,7 @@ from lippukala.models import Code, Order
 def _create_test_order():
     fname = random.choice(["Teppo", "Tatu", "Tauno", "Tintti", "Taika"])
     order = Order.objects.create(
-        address_text="%s Testinen\nTestikatu %d\n%05d Turku\nFinland"
-        % (fname, random.randint(1, 50), random.randint(0, 99999)),
+        address_text=f"{fname} Testinen\nTestikatu {int(random.randint(1, 50))}\n{int(random.randint(0, 99999)):05} Turku\nFinland",
         free_text="Tervetuloa Testiconiin!",
         comment=f"{fname} on kiva jätkä.",
         reference_number=str(int(time.time() * 10000 + random.randint(0, 35474500))),
@@ -22,7 +21,7 @@ def _create_test_order():
         if prefix == "4":
             product_text = "Iltabilelippu"
         else:
-            product_text = "Lippu %d" % (x + 1)
+            product_text = f"Lippu {int(x + 1)}"
         code = Code.objects.create(order=order, prefix=prefix, product_text=product_text)
         assert code.full_code in force_str(code)
         assert code.literate_code in force_str(code)

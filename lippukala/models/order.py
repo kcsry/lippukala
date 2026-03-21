@@ -22,4 +22,4 @@ class Order(models.Model):
     comment = models.TextField(blank=True, help_text="Administrative comment")
 
     def __str__(self):
-        return "LK-%08d (ref %s)" % (self.pk, self.reference_number)
+        return f"LK-{int(self.pk):08} (ref {self.reference_number})"

@@ -23,7 +23,7 @@ class CodeReportWriter:
 
     def get_report(self, format, as_response):
         format = str(format).lower()
-        filename = "code_report_%d.%s" % (time.time(), format)
+        filename = f"code_report_{int(time.time())}.{format}"
         format_writer = getattr(self, f"format_{format}_report", None)
         if not format_writer:  # pragma: no cover
             raise ValueError(f"Unknown format: {format!r}")

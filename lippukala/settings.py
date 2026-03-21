@@ -42,8 +42,7 @@ def validate_settings():  # pragma: no cover
 def _validate_code():
     if CODE_MIN_N_DIGITS <= 5 or CODE_MAX_N_DIGITS < CODE_MIN_N_DIGITS:
         raise ImproperlyConfigured(
-            "The range (%d .. %d) for Lippukala code digits is invalid"
-            % (CODE_MIN_N_DIGITS, CODE_MAX_N_DIGITS)
+            f"The range ({int(CODE_MIN_N_DIGITS)} .. {int(CODE_MAX_N_DIGITS)}) for Lippukala code digits is invalid"
         )
 
 

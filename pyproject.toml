@@ -57,12 +57,15 @@ ignore_missing_imports = true
 line-length = 110
 
 [tool.ruff.lint]
-ignore = []
+ignore = [
+    "E501", # ruff format does this
+]
 select = [
     "C9",
     "E",
     "F",
     "I",
+    "UP",
     "W",
 ]
 
