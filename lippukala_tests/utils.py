@@ -18,8 +18,12 @@ def _create_test_order():
     assert order.pk
     assert str(order.pk) in force_str(order)
     for x in range(25):
-        prefix = str(x % 4)
-        code = Code.objects.create(order=order, prefix=prefix, product_text="Lippu %d" % (x + 1))
+        prefix = str(x % 5)
+        if prefix == "4":
+            product_text = "Iltabilelippu"
+        else:
+            product_text = "Lippu %d" % (x + 1)
+        code = Code.objects.create(order=order, prefix=prefix, product_text=product_text)
         assert code.full_code in force_str(code)
         assert code.literate_code in force_str(code)
     return order

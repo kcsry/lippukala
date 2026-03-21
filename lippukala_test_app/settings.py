@@ -15,6 +15,7 @@ LIPPUKALA_PREFIXES = {
     "1": "nom",
     "2": "dog-jono",
     "3": "cat-jono",
+    "4": "kreba",
 }
 
 LIPPUKALA_LITERATE_KEYSPACES = {
@@ -25,6 +26,7 @@ LIPPUKALA_LITERATE_KEYSPACES = {
     ).split(),
     "2": "Murre Rekku Haukku yksi pallo".split(),
     "3": "Miuku Mauku Kitler kaksi neliö".split(),
+    "4": "rave party disco ball beat jungle drum bass".split(),
 }
 
 LIPPUKALA_CODE_MIN_N_DIGITS = 6
