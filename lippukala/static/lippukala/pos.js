@@ -145,6 +145,7 @@ function showCode(code) {
     );
     statusDiv.classList.toggle("check-year", isPossiblyOldCode(code));
     document.body.className = getCodeCSSClass(code);
+    document.body.classList.toggle("iltabile", /iltabile/i.test(code.prod));
     acceptBtn.disabled = !!code.used;
   } else {
     currentlyShownId = null;

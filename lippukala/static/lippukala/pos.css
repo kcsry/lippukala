@@ -66,6 +66,7 @@ body.code-used-here .statustext {
 }
 
 .product {
+  font-size: 1.5em;
   margin: 0.5rem 0;
   padding: 0.5rem;
   background: rgb(0, 0, 0, 0.4);
@@ -176,6 +177,35 @@ textarea#log {
 textarea#log:hover {
   opacity: 1;
   height: 25em;
+}
+
+body.iltabile::after {
+  content: "🪩";
+  position: fixed;
+  bottom: 0.1em;
+  left: 0.1em;
+  font-size: 20vw;
+  line-height: 1;
+  pointer-events: none;
+  animation: disco-jump 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes disco-jump {
+  0% {
+    transform: translate(-2vw, 0) rotate(-8deg);
+  }
+  25% {
+    transform: translate(0, -3vw) rotate(0deg);
+  }
+  50% {
+    transform: translate(2vw, 0) rotate(8deg);
+  }
+  75% {
+    transform: translate(0, -3vw) rotate(0deg);
+  }
+  100% {
+    transform: translate(-2vw, 0) rotate(-8deg);
+  }
 }
 
 @keyframes blink {
