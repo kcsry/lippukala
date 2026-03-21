@@ -39,8 +39,11 @@ INSTALLED_APPS = (
     "django.contrib.contenttypes",
     "django.contrib.messages",
     "django.contrib.sessions",
+    "django.contrib.staticfiles",
     "lippukala",
 )
+
+STATIC_URL = "/static/"
 
 MIDDLEWARE = (
     "django.contrib.sessions.middleware.SessionMiddleware",
